@@ -12,9 +12,12 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("bottom_nav loaded");
+
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
+
       type: BottomNavigationBarType.fixed,
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),

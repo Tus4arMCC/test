@@ -6,8 +6,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+      debugPrint("HomeScreen loaded");
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+
       initialRoute: AppRoutes.login,
       routes: AppRoutes.routes,
     );

@@ -24,6 +24,8 @@ class _MainTabScreenState extends State<MainTabScreen> {
 
   @override
   Widget build(BuildContext context) {
+            debugPrint("main_tab loaded");
+
     return Scaffold(
       body: _pages[_index],
       bottomNavigationBar: AppBottomNav(

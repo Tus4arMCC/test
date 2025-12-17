@@ -5,6 +5,8 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+            debugPrint("Profile loaded");
+
     return const Center(
       child: Text('ProfileScreen', style: TextStyle(fontSize: 22)),
     );

@@ -5,6 +5,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+            debugPrint("Home loaded");
+
     return const Center(child: Text('Home', style: TextStyle(fontSize: 22)));
   }
 }

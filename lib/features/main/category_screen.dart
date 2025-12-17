@@ -5,6 +5,8 @@ class CategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+        debugPrint("Categories loaded");
+
     return const Center(
       child: Text('Categories', style: TextStyle(fontSize: 22)),
     );

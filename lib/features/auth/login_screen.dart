@@ -5,8 +5,15 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('LoginScreen', style: TextStyle(fontSize: 22)),
+    return Scaffold(
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/main');
+          },
+          child: const Text("Login"),
+        ),
+      ),
     );
   }
 }
