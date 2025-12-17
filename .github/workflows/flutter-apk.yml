@@ -7,11 +7,11 @@ on:
       - main
 
 jobs:
-  build-apk:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout source code
         uses: actions/checkout@v4
 
       - name: Set up Java
@@ -23,11 +23,18 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
           channel: 'stable'
 
-      - name: Flutter pub get
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      - name: Install dependencies
         run: flutter pub get
+
+      # OPTIONAL: create .env from GitHub secrets
+      - name: Create .env file
+        run: |
+          echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" > .env
 
       - name: Build APK (Release)
         run: flutter build apk --release
@@ -35,5 +42,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
+          name: pksoft-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
