@@ -1,22 +1,24 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AuthService {
-  static const String _loginUrl =
-      "http://192.168.1.6:5260/api/pk/Customer/auth";
+  static final String _baseUrl =
+      dotenv.env['API_BASE_URL'] ?? '';
 
   static Future<Map<String, dynamic>> login({
-    required String username,
+    required String username, 
     required String password,
   }) async {
+    final uri = Uri.parse("$_baseUrl/api/pk/Customer/auth");
+
     final response = await http.post(
-      Uri.parse(_loginUrl),
+      uri,
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
       body: jsonEncode({
-        // MUST match Swagger model exactly
         "username": username,
         "password": password,
       }),
