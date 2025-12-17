@@ -34,8 +34,6 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Create .env file
-        run: echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" > .env
 
       - name: Build APK (Release)
         run: flutter build apk --release

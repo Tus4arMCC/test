@@ -3,29 +3,27 @@ import 'package:http/http.dart' as http;
 
 class AuthService {
   static const String _loginUrl =
-      "http://192.168.1.9:5260/api/Auth/login";
+      "http://192.168.1.6:5260/api/pk/Customer/auth";
 
   static Future<Map<String, dynamic>> login({
     required String username,
     required String password,
   }) async {
-    final uri = Uri.parse(_loginUrl);
-
     final response = await http.post(
-      uri,
+      Uri.parse(_loginUrl),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
       body: jsonEncode({
+        // MUST match Swagger model exactly
         "username": username,
         "password": password,
-        // ❗ only include fields Swagger expects
       }),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
+      return jsonDecode(response.body);
     } else {
       throw Exception(
         "Login failed ${response.statusCode}: ${response.body}",
