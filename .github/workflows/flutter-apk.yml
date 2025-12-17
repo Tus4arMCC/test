@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - dev
 
 jobs:
   build:
@@ -45,3 +45,4 @@ jobs:
         with:
           name: pksoft-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+  

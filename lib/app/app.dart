@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_theme.dart';
+import '../core/theme/theme_controller.dart';
 import 'routes.dart';
 
 class MyApp extends StatelessWidget {
@@ -6,12 +8,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      debugPrint("HomeScreen loaded");
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-
-      initialRoute: AppRoutes.login,
-      routes: AppRoutes.routes,
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeController.themeMode,
+      builder: (_, mode, __) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: mode,
+          initialRoute: '/',
+          routes: AppRoutes.routes,
+        );
+      },
     );
   }
 }

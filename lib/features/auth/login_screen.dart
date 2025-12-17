@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'auth_service.dart';
+import '../../common/popup/app_popup.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -25,14 +25,47 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordCtrl.text.trim(),
       );
 
-      debugPrint("Login success: $res");
+      // 🔴 EXPECTED RESPONSE FORMAT
+      // {
+      //   "messageCode": 100,
+      //   "message": "Login successful"
+      // }
+
+      final int messageCode = res['messageCode'] ?? 0;
+      final String message =
+          res['message'] ?? 'Something went wrong';
 
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/main');
+
+      if (messageCode == 100) {
+        AppPopup.show(
+          context,
+          title: "Success",
+          message: message,
+          type: PopupType.success,
+        );
+
+        Future.delayed(const Duration(milliseconds: 800), () {
+          if (mounted) {
+            Navigator.pushReplacementNamed(context, '/main');
+          }
+        });
+      } else {
+        AppPopup.show(
+          context,
+          title: "Login Failed",
+          message: message,
+          type: PopupType.error,
+        );
+      }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
+
+      AppPopup.show(
+        context,
+        title: "Error",
+        message: e.toString(),
+        type: PopupType.error,
       );
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -41,8 +74,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -50,7 +85,6 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                /// Back Arrow
                 IconButton(
                   onPressed: () {},
                   icon: const Icon(Icons.arrow_back_ios_new),
@@ -58,18 +92,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 16),
 
-                /// Top Design Card (UNCHANGED)
+                /// Top Card (still custom, brand-based)
                 Container(
                   height: 220,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color(0xFF2C0E0E),
-                        Color(0xFF7A1E1E),
+                        colorScheme.primary,
+                        colorScheme.primaryContainer,
                       ],
                     ),
                   ),
@@ -77,42 +111,33 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 28),
 
-                /// Title
-                const Text(
+                Text(
                   "Welcome Back",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: theme.textTheme.titleLarge,
                 ),
 
                 const SizedBox(height: 6),
 
-                const Text(
+                Text(
                   "Log in to access your curated wardrobe.",
-                  style: TextStyle(color: Colors.grey),
+                  style: theme.textTheme.bodyMedium,
                 ),
 
                 const SizedBox(height: 28),
 
-                /// username
                 const Text("Email Address"),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _usernameCtrl,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "jane@fashion.com",
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    prefixIcon: Icon(Icons.email_outlined),
                   ),
                 ),
 
                 const SizedBox(height: 18),
 
-                /// Password
                 const Text("Password"),
                 const SizedBox(height: 8),
                 TextField(
@@ -125,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         _obscurePassword
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: Colors.pink,
+                        color: colorScheme.primary,
                       ),
                       onPressed: () {
                         setState(() {
@@ -133,65 +158,46 @@ class _LoginScreenState extends State<LoginScreen> {
                         });
                       },
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                   ),
                 ),
 
                 const SizedBox(height: 10),
 
-                /// Forgot Password
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {},
-                    child: const Text(
-                      "Forgot Password?",
-                      style: TextStyle(color: Colors.pink),
-                    ),
+                    child: const Text("Forgot Password?"),
                   ),
                 ),
 
                 const SizedBox(height: 16),
 
-                /// Login Button (DESIGN SAME, LOGIC ADDED)
                 SizedBox(
                   width: double.infinity,
                   height: 52,
                   child: ElevatedButton(
                     onPressed: _loading ? null : _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pink,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
                     child: _loading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            "Log In →",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                        ? const CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        : const Text("Log In →"),
                   ),
                 ),
 
                 const SizedBox(height: 20),
 
-                /// Sign Up
                 Center(
                   child: RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       text: "Don't have an account? ",
-                      style: TextStyle(color: Colors.grey),
+                      style: theme.textTheme.bodyMedium,
                       children: [
                         TextSpan(
                           text: "Sign Up",
                           style: TextStyle(
-                            color: Colors.pink,
+                            color: colorScheme.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
