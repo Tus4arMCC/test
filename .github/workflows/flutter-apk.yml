@@ -1,7 +1,7 @@
 name: Build Flutter APK
 
 on:
-  workflow_dispatch:   # manual trigger
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      FLUTTER_DISABLE_FILE_WATCHER: true
 
     steps:
       - name: Checkout source code
@@ -31,10 +34,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # OPTIONAL: create .env from GitHub secrets
       - name: Create .env file
-        run: |
-          echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" > .env
+        run: echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" > .env
 
       - name: Build APK (Release)
         run: flutter build apk --release
