@@ -9,7 +9,7 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    final url = Uri.parse("$_baseUrl/auth/login");
+    final url = Uri.parse("$_baseUrl/Auth/login");
 
     final response = await http.post(
       url,
