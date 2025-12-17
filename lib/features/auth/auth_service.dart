@@ -6,7 +6,7 @@ class AuthService {
   static final String _baseUrl = dotenv.env['API_BASE_URL']!;
 
   static Future<Map<String, dynamic>> login({
-    required String email,
+    required String username,
     required String password,
   }) async {
     final url = Uri.parse("$_baseUrl/Auth/login");
@@ -17,8 +17,9 @@ class AuthService {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        "email": email,
+        "username": username,
         "password": password,
+        "userType": 5,
       }),
     );
 

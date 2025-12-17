@@ -10,7 +10,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailCtrl = TextEditingController();
+  final _usernameCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
 
   bool _obscurePassword = true;
@@ -21,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final res = await AuthService.login(
-        email: _emailCtrl.text.trim(),
+        username: _usernameCtrl.text.trim(),
         password: _passwordCtrl.text.trim(),
       );
 
@@ -95,11 +95,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 28),
 
-                /// Email
+                /// username
                 const Text("Email Address"),
                 const SizedBox(height: 8),
                 TextField(
-                  controller: _emailCtrl,
+                  controller: _usernameCtrl,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     hintText: "jane@fashion.com",
