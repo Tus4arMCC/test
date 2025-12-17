@@ -3,13 +3,13 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AuthService {
-  static final String _baseUrl = dotenv.env['API_BASE_URL']!;
+  // static final String _baseUrl = dotenv.env['API_BASE_URL']!;
 
   static Future<Map<String, dynamic>> login({
     required String username,
     required String password,
   }) async {
-    final url = Uri.parse("$_baseUrl/Auth/login");
+    final url = Uri.parse("http://192.168.1.9:5260/api/Auth/login");
 
     final response = await http.post(
       url,
