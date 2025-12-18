@@ -6,8 +6,8 @@ import '../features/auth/register_screen.dart';
 // import '../features/auth/forgot_password_screen.dart';
 
 class AppRoutes {
-  static const login = '/';
-  static const main = '/main';
+  static const login = '/login';
+  static const main = '/';
   static const profile = '/profile';
 
   static Map<String, WidgetBuilder> get routes => {
