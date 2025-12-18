@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'bottom_nav.dart';
-import 'home_screen.dart';
-import 'category_screen.dart';
-import 'cart_screen.dart';
-import 'profile_screen.dart';
+import '../screens/home_screen.dart';
+import '../screens/explore_screen.dart';
+import '../screens/cart_screen.dart';
+import '../screens/profile_screen.dart';
 
 class MainTabScreen extends StatefulWidget {
   const MainTabScreen({super.key});
@@ -17,7 +17,7 @@ class _MainTabScreenState extends State<MainTabScreen> {
 
   final _pages = const [
     HomeScreen(),
-    CategoryScreen(),
+    ExploreScreen(),
     CartScreen(),
     ProfileScreen(),
   ];
