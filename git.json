@@ -1,0 +1,7 @@
+{
+    "dev_merge_to_mai"{
+        "Switch to main"        :"git checkout main",
+        "Main upto Date"        :"git checkout main",
+        "Merge dev into main"   :"git merge dev"
+    }
+}
