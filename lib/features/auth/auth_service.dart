@@ -66,7 +66,7 @@ class AuthService {
         "emailId": emailId,
         "token": token,
         "otpCode": otpCode,
-        "postingDate": DateTime.now().toString(),
+        "postingDate": getPostingDate(),
       }),
     );
 

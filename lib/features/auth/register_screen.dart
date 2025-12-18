@@ -20,8 +20,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _loading = false;
 
   String? _otpToken; // save token from register
-
-  String? _token;
   String? _otpError;
 
   Future<void> _register() async {
