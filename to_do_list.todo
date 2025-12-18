@@ -1,4 +1,13 @@
 Task:
     New Features:
-                ☐- add login button  to signup page
-                ☐ - add forgot password link to login page 
+        Tushar Task:
+                ☐ Add login button to signup page
+                ☐ Add forgot password link to login page
+    Bug Fixes:
+        Backend:
+            Sir Task:
+                ☐ OTP verify message update "Your Login Details are sent to your registered email id"
+                ☐ Add the New cors policy to the backend server 
+
+New Extensions:
+    ☐ Create a new Extension for TO DO List For all Devolopers 
