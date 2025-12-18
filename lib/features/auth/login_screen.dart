@@ -32,8 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // }
 
       final int messageCode = res['messageCode'] ?? 0;
-      final String message =
-          res['message'] ?? 'Something went wrong';
+      final String message = res['message'] ?? 'Something went wrong';
 
       if (!mounted) return;
 
@@ -111,10 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 28),
 
-                Text(
-                  "Welcome Back",
-                  style: theme.textTheme.titleLarge,
-                ),
+                Text("Welcome Back", style: theme.textTheme.titleLarge),
 
                 const SizedBox(height: 6),
 
@@ -166,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () => Navigator.pushNamed(context, '/forgot'),
                     child: const Text("Forgot Password?"),
                   ),
                 ),
@@ -179,9 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ElevatedButton(
                     onPressed: _loading ? null : _login,
                     child: _loading
-                        ? const CircularProgressIndicator(
-                            color: Colors.white,
-                          )
+                        ? const CircularProgressIndicator(color: Colors.white)
                         : const Text("Log In →"),
                   ),
                 ),
@@ -189,20 +183,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
 
                 Center(
-                  child: RichText(
-                    text: TextSpan(
-                      text: "Don't have an account? ",
-                      style: theme.textTheme.bodyMedium,
-                      children: [
-                        TextSpan(
-                          text: "Sign Up",
-                          style: TextStyle(
-                            color: colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+                  child: TextButton(
+                    onPressed: () => Navigator.pushNamed(context, '/register'),
+                    child: const Text("Sign Up"),
                   ),
                 ),
               ],
