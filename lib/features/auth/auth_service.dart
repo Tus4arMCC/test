@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../../core/utils/date_utils.dart';
 
 class AuthService {
   static final String _baseUrl =
@@ -45,7 +46,7 @@ class AuthService {
         "name": name,
         "emailId": emailId,
         "mobile": mobile,
-        "postingDate": DateTime.now().toString(),
+        "postingDate": getPostingDate(),
       }),
     );
 
