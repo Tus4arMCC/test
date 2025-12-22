@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () => Navigator.pushNamed(context, '/'),
                   icon: const Icon(Icons.arrow_back_ios_new),
                 ),
 

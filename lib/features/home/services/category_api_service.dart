@@ -21,7 +21,8 @@ class CategoryApiService {
       );
 
       if (res.statusCode == 200) {
-        final List data = jsonDecode(res.body);
+        final Map<String, dynamic> response = jsonDecode(res.body);
+        final List data = response['data'] ?? [];
         return data.map((e) => e['name'].toString()).toList();
       }
     } catch (_) {}

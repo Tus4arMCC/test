@@ -88,4 +88,23 @@ class AuthService {
     return jsonDecode(res.body);
   }
 
+  static Future<Map<String, dynamic>> fetchHomeProducts() async {
+  final uri = Uri.parse("$_baseUrl/api/pk/Customer/load/details");
+
+  final res = await http.get(
+    uri,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+  );
+
+  if (res.statusCode == 200) {
+    return jsonDecode(res.body);
+  } else {
+    throw Exception(
+      "Failed to load home products (${res.statusCode})",
+    );
+  }
+}
 }
