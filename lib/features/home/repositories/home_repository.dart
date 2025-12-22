@@ -1,11 +1,12 @@
 import '../../../core/cache/cache_manager.dart';
 import '../../product/models/product_tag_model.dart';
 import '../../auth/auth_service.dart';
+import '../../home/services/product_api_service.dart';
 
 class HomeRepository {
   static const _cacheKey = "home_products";
   static const _cacheTimeKey = "home_products_time";
-  static const _ttl = Duration(minutes: 15);
+  static const _ttl = Duration(minutes: 30);
 
   Future<List<ProductTag>> fetchHomeProducts() async {
     final cache = CacheManager.instance;
@@ -27,7 +28,7 @@ class HomeRepository {
     }
 
     /// 3️⃣ API FETCH
-    final response = await AuthService.fetchHomeProducts();
+    final response = await ProductApiService.fetchHomeProducts();
     final List list = response['data'];
 
     final tags = list
