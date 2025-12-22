@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class SavedScreen extends StatelessWidget {
-  const SavedScreen({super.key});
+class WishlistScreen extends StatelessWidget {
+  const WishlistScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

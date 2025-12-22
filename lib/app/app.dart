@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeController.themeMode,
+      valueListenable: ThemeController.themeMode, // ✅ FIX
       builder: (_, mode, __) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,

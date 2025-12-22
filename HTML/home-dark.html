@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fashion E-commerce Home Screen</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec1380",
+                        "background-light": "#f8f6f7",
+                        "background-dark": "#0a0a0a",},
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .skeleton-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }.dark .skeleton-shimmer {
+            background: linear-gradient(90deg, #1f1f1f 25%, #2d2d2d 50%, #1f1f1f 75%);
+            background-size: 200% 100%;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-white pb-20 transition-colors duration-300">
+<header class="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm px-4 pt-4 pb-2 transition-all">
+<div class="flex items-center gap-3">
+<label class="flex flex-1 items-center h-12 bg-white dark:bg-white/10 rounded-full shadow-sm border border-gray-100 dark:border-white/5 overflow-hidden px-4 transition-colors">
+<span class="material-symbols-outlined text-gray-400 dark:text-gray-400">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-sm ml-2 placeholder-gray-400 dark:placeholder-gray-500 text-gray-800 dark:text-gray-100" placeholder="Search for shoes, tops..."/>
+</label>
+<button class="relative flex items-center justify-center size-12 rounded-full bg-white dark:bg-white/10 shadow-sm border border-gray-100 dark:border-white/5 flex-shrink-0 group transition-colors">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10" data-alt="User profile picture of a woman smiling" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDD3SRBnqog_k4QWLzimbdJaKIQu7YH9B3vGSXqxIEcA5QXNzfBIGNPCmihNCCqVOCqVQ_TtDpQZwbGJ7lnMR6C04QW7U85MOCnaOSC88O0tVwLaTT_H0PI_w1WpnYcg8Sm7LpWZpDF11wTOvy8XWxtE6i8JTGR4LO8NY591ENjau8b9W1CPSlrugHYl41l_FDFo-TbdbMasDYIrRuOJDZmQSLKTyAc7qHv8cnQiQEahCmuNZx7yqAkbpcYPi0Z_qwRgzS2se6gYrjZ");'></div>
+<span class="absolute top-0 right-0 size-3 bg-primary rounded-full border-2 border-background-light dark:border-background-dark"></span>
+</button>
+</div>
+</header>
+<main class="flex flex-col gap-6 overflow-x-hidden pt-2">
+<section class="px-4">
+<div class="relative w-full aspect-[4/5] sm:aspect-[2/1] rounded-2xl overflow-hidden shadow-sm group">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="Fashion model wearing bright summer clothes jumping in the air" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBOJGgtaI6t0ZWM6ly5-lgLuBn4nPGyk7vC_e6UwGUImJsiyAm7mSbXq5vbetFH5JMZoxnonkmCGWHBSI0D9Vi9k3LLCU2h3oHZqSmOxD7yA3M_VPTKEEvtctXxShYsawG7OwAJzwxFvwNLcRKKLo76KiNR_Zfhp0X82pHvzVAng-8_mQbTcYfQ7mjesIgB7zddXy7ForM9D4ASKLiaNEUYZXGJMr32G3QUDo8IGS4FEDScdmUT2WqF4Mg8luk7H_AdX9sFncVHEr2j");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+<span class="inline-block px-3 py-1 bg-primary text-xs font-bold uppercase tracking-wider rounded-full mb-3">Summer Sale</span>
+<h1 class="text-3xl font-extrabold leading-tight mb-2">Up to 50% Off<br/>New Collection</h1>
+<p class="text-gray-200 text-sm mb-4 line-clamp-2">Discover the hottest trends for the sunny season. Limited time offer.</p>
+<button class="bg-white text-primary px-6 py-3 rounded-xl text-sm font-bold shadow-lg active:scale-95 transition-transform">
+                        Shop Now
+                    </button>
+</div>
+<div class="absolute bottom-4 right-4 flex gap-1.5">
+<div class="w-2 h-2 bg-white rounded-full"></div>
+<div class="w-2 h-2 bg-white/50 rounded-full"></div>
+<div class="w-2 h-2 bg-white/50 rounded-full"></div>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between px-4 mb-3">
+<h2 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">Shop by Category</h2>
+</div>
+<div class="flex gap-3 px-4 overflow-x-auto no-scrollbar pb-2">
+<button class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-full whitespace-nowrap shadow-md shadow-primary/20 flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">checkroom</span>
+<span class="text-sm font-semibold">All</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-full whitespace-nowrap flex-shrink-0 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
+<span class="text-sm font-medium text-gray-700 dark:text-gray-200">Dresses</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-full whitespace-nowrap flex-shrink-0 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
+<span class="text-sm font-medium text-gray-700 dark:text-gray-200">Shoes</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-full whitespace-nowrap flex-shrink-0 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
+<span class="text-sm font-medium text-gray-700 dark:text-gray-200">Bags</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-full whitespace-nowrap flex-shrink-0 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
+<span class="text-sm font-medium text-gray-700 dark:text-gray-200">Accessories</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-full whitespace-nowrap flex-shrink-0 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
+<span class="text-sm font-medium text-gray-700 dark:text-gray-200">Denim</span>
+</button>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between px-4 mb-4">
+<h2 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">New Arrivals</h2>
+<a class="text-primary dark:text-pink-400 text-sm font-semibold hover:underline" href="#">See All</a>
+</div>
+<div class="flex gap-4 px-4 overflow-x-auto no-scrollbar pb-4 snap-x">
+<div class="flex flex-col gap-3 w-40 flex-shrink-0 snap-start group cursor-pointer">
+<div class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-gray-100 dark:bg-white/5">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Woman wearing a floral summer dress standing in a field" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCQgLVJmIekoWHsRSyIi0gRG8IS6Fdr7iPv-z_WNnAglPQ3FZczakf_nlWLYFLuzchcE7iT4lbe7scWTmIGm-UAG1-8g4FjlGZyfsCUqhDYB0Vn6IcItGkLYaP4VWqvZ-19MbxXOI73lkpGdWTyOhHsNJDrI9KSrMvUJYF2kxfLILPurs4WRHOGJpwxggZFLRlKWTHxG9gPcIwjJukvCvp64a6AYsFJQi7s_btefaG6OBbOqwANsfX4e2BPrZ9I4OytmtAQ0ucZD5U"/>
+<button class="absolute top-2 right-2 p-1.5 bg-white/90 backdrop-blur-sm rounded-full text-gray-400 hover:text-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px] fill-current">favorite</span>
+</button>
+</div>
+<div>
+<h3 class="text-sm font-semibold truncate text-gray-900 dark:text-white">Floral Summer Dress</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">H&amp;M Studio</p>
+<div class="flex items-center gap-2">
+<span class="text-primary dark:text-pink-400 font-bold text-sm">$49.99</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3 w-40 flex-shrink-0 snap-start group cursor-pointer">
+<div class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-gray-100 dark:bg-white/5">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Blue denim high heels shoes on a light blue background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClPd8AUbi2LZRhrn_Cjc0tkl3Eb7_csz8DNpEpNkbvsnxbhV_Thbc54M8JMm6h86f179YZk3a3vY9dcPndb1y0vaWmOvChUF-37P2LqFYIaBbk6zOn18jcWJekOHbee2x-pK5094E_7nS5MNAirKhRYtmpS5pf5fB_uWQj3xlshdRfF-dispEAPLrxaUrey-bQbYIZ1IuAwN2-hY5Y6SY8lGYHBeeXB72oSoFS6LRuIO8P5GwwmC78m8d3ptjr0DFQjBEXOJziCUIf"/>
+<button class="absolute top-2 right-2 p-1.5 bg-white/90 backdrop-blur-sm rounded-full text-primary shadow-sm">
+<span class="material-symbols-outlined text-[20px] fill-current" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<div>
+<h3 class="text-sm font-semibold truncate text-gray-900 dark:text-white">Denim High Heels</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Zara</p>
+<div class="flex items-center gap-2">
+<span class="text-primary dark:text-pink-400 font-bold text-sm">$89.90</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3 w-40 flex-shrink-0 snap-start group cursor-pointer">
+<div class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-gray-100 dark:bg-white/5">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Close up of a luxury leather handbag" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOzHN72nCopgxk3B5DtketrJ52luNa4tlsOz7r3bYvjybgnFCGBy28AcJV9VLPoV1_WX5h7sgMCH7R0U0mw7K-p5pb9Knk1O5M_4acidUVd_zO1AdJcVgkOZ9zJdO3Ix2RCrd7Y3fU_LHZkkW1deHSL3FUy_3cVRmXKIexkmiJ94ZRj1oVh9Avw5clKSL9mFgmqbil0INADMOYu9Q5bGFrbXKWKvm1S8O8syVgvbJDatQLoJ0EyQnNlaNT_FWhR3SioPlEZ7bODrTZ"/>
+<button class="absolute top-2 right-2 p-1.5 bg-white/90 backdrop-blur-sm rounded-full text-gray-400 hover:text-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px] fill-current">favorite</span>
+</button>
+</div>
+<div>
+<h3 class="text-sm font-semibold truncate text-gray-900 dark:text-white">Leather Mini Bag</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Gucci</p>
+<div class="flex items-center gap-2">
+<span class="text-primary dark:text-pink-400 font-bold text-sm">$1,200.00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="px-4">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Trending Now</h2>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="col-span-2 relative aspect-[2/1] rounded-2xl overflow-hidden group cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="Fashion model walking on a street wearing urban chic outfit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWvGF5C7W3wM84s7XnMqxywV6wZ-b3UKGmDgler0ew2OOzVHv5dU3KoTse1XOPf94dVMJFbY5NUTULjeBxBzWnIhOAmLOEpa7VOdJY8vXX3mxiOkeyBwsFUe9OnjBm5viVA07xpymRI4xzqb68yen4vpxSx_0c4slTWQFc1rMfi2Si_L3qIdXLHow0-H0CU21o23liw3EO0TsiRT1ecrIFg8xO2UZI8llqCxlFlgcwnWluBxk3wzDEVu7WnPDdZb4hjS0kasc3yu13"/>
+<div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center p-6">
+<span class="text-white/80 text-xs font-bold uppercase tracking-widest mb-1">Editor's Pick</span>
+<h3 class="text-white text-2xl font-bold mb-2">Urban Chic</h3>
+<p class="text-white/90 text-sm font-medium">Shop the look →</p>
+</div>
+</div>
+<div class="bg-white dark:bg-white/5 rounded-2xl p-2 shadow-sm border border-gray-50 dark:border-white/5 group cursor-pointer">
+<div class="relative aspect-square rounded-xl overflow-hidden mb-2">
+<img class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="Gold layered necklace on a model" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoV2Zw5NjoLJaYrrAysr8qkHZrcMAPsDDb8tb4-Yo0iY94fT-uzEuh-ra1niE3vz4MceCTPeKPLWcjW6yBV6bx1tjnvhz5_FBVEaInfxhVx35wOS0A0CsYjB8mlfukp-UkDq8cwYf5CmwRzWZS3X5aqwUPhR2wqDQz8VoNUxXs9iSMdYfQ6IC2zpqQA0MhpH9gITiIFlaEyanvta--bJUhtdx1isSyNTHkL4w2rRbZ8A631TTaZSGUgfx6YQQA9GySXy0i7HPL0fP6"/>
+<span class="absolute top-2 left-2 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-20%</span>
+</div>
+<div class="px-1">
+<h4 class="text-sm font-semibold truncate text-gray-900 dark:text-white">Gold Necklace</h4>
+<div class="flex items-center justify-between mt-1">
+<span class="text-xs font-bold text-gray-900 dark:text-white">$35.00</span>
+<span class="text-[10px] text-gray-400 line-through">$45.00</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-white/5 rounded-2xl p-2 shadow-sm border border-gray-50 dark:border-white/5 group cursor-pointer">
+<div class="relative aspect-square rounded-xl overflow-hidden mb-2">
+<img class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="Beige winter coat hanging" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtwzJm6rP_nBD9QVWAyxq-NS2osrqM0gGYJdo7J8VFxlUjEJT6O6-YIXhEUynQlK0aizICO3HsZGOUHDfOxLfcTNcwXSJiC8lKkqWlJ-H4lHgrNqEC8K85WhqvLue3dudcQ4MOP-y4uPi77fBHBYGVssmNsd-GQZF0P3bwFUTTicT-AmVFEetxbwoL30hzXTeRewe8iVEG4687pjXbPjmyWvwA0lihSHDifbnwlUv8U3vpBbtbbZaOB--tnFDQQ9aRYfBtuvg4Rlmz"/>
+</div>
+<div class="px-1">
+<h4 class="text-sm font-semibold truncate text-gray-900 dark:text-white">Beige Coat</h4>
+<div class="flex items-center justify-between mt-1">
+<span class="text-xs font-bold text-gray-900 dark:text-white">$150.00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="px-4 pb-24">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Just for You</h2>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex gap-4 bg-white dark:bg-white/5 p-3 rounded-2xl shadow-sm border border-gray-50 dark:border-white/5">
+<div class="w-24 aspect-square rounded-xl overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Classic white sneakers on a yellow background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjrDU6yxmgSAQzEmOyf-ZC_hShUImeRzi8RXuiDabtBV41Jm9eGWSiImNMiNpsD_4ud28DYreTygkBdjHXCywDfFaLat5Vpmo12YhqyMx_0KDDdlah_QRLWnVHbYWfRaD_SsDxGFoPGSlwT25pvnyVhUqbbbwGM5DVqTxMRpKmPZTFehRHNtRvvqLB1rVmSGqayLbF0NCfjHvp__rUrCN1o5P7ZfiKQxHUU3pFBzjJtEqiE0aSX2T8J_J6eHgMyQhNKZTZRLTz5Efe"/>
+</div>
+<div class="flex flex-col justify-center flex-1">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-bold text-gray-900 dark:text-white">Classic Sneakers</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Nike</p>
+</div>
+<button class="text-gray-400 hover:text-primary"><span class="material-symbols-outlined text-[20px]">favorite</span></button>
+</div>
+<div class="flex items-center gap-2 mt-auto">
+<span class="text-primary dark:text-pink-400 font-bold">$85.00</span>
+<div class="flex items-center text-xs text-yellow-500 ml-auto">
+<span class="material-symbols-outlined text-[14px] fill-current" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="ml-0.5 font-medium text-gray-600 dark:text-gray-400">4.8</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex gap-4 bg-white dark:bg-white/5 p-3 rounded-2xl shadow-sm border border-gray-50 dark:border-white/5">
+<div class="w-24 aspect-square rounded-xl overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Woman wearing a silk dress in a studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIqdtD-GSkN0CuUtwDU5P-twY4YbikQITSJpWH0gdB1j3O-vNEtNIzMhbaZWyFxILHapAnmgvjJVu7NtY7fkXaJq-tAwQ_UmrvWp3gIp1jsd0bcIIgVXLjhyng74yKRaUYrWcxelPhQKS--Ei8xUIhRzCB4qKuiFQLIcJxD1hxQPVV6mBCDt9RCqXfRXY5zO9chMT6xwAhxOOTZIhH5lhMZcJSPy4NsDoVaxGohPyKIdyWgtqayui10CgKJUlKiLE1LQXbxDtuejhU"/>
+</div>
+<div class="flex flex-col justify-center flex-1">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-bold text-gray-900 dark:text-white">Silk Evening Gown</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Versace</p>
+</div>
+<button class="text-gray-400 hover:text-primary"><span class="material-symbols-outlined text-[20px]">favorite</span></button>
+</div>
+<div class="flex items-center gap-2 mt-auto">
+<span class="text-primary dark:text-pink-400 font-bold">$2,300.00</span>
+<div class="flex items-center text-xs text-yellow-500 ml-auto">
+<span class="material-symbols-outlined text-[14px] fill-current" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="ml-0.5 font-medium text-gray-600 dark:text-gray-400">5.0</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 z-50 w-full bg-white dark:bg-[#18181b] border-t border-gray-100 dark:border-white/5 pb-5 pt-3 px-6 shadow-lg transition-colors">
+<div class="flex justify-between items-center">
+<button class="flex flex-col items-center gap-1 text-primary group">
+<span class="material-symbols-outlined text-[26px] fill-current" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary transition-colors group">
+<span class="material-symbols-outlined text-[26px]">search</span>
+<span class="text-[10px] font-medium group-hover:text-primary">Explore</span>
+</button>
+<button class="flex flex-col items-center justify-center -mt-8 size-14 bg-primary rounded-full shadow-lg shadow-primary/30 text-white transition-transform active:scale-90">
+<div class="relative">
+<span class="material-symbols-outlined text-[24px]">shopping_bag</span>
+<span class="absolute -top-1 -right-1 flex items-center justify-center size-4 bg-white text-primary text-[9px] font-bold rounded-full border-2 border-primary">2</span>
+</div>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary transition-colors group">
+<span class="material-symbols-outlined text-[26px]">favorite</span>
+<span class="text-[10px] font-medium group-hover:text-primary">Saved</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 dark:text-gray-500 hover:text-primary transition-colors group">
+<span class="material-symbols-outlined text-[26px]">person</span>
+<span class="text-[10px] font-medium group-hover:text-primary">Profile</span>
+</button>
+</div>
+</nav>
+
+</body></html>

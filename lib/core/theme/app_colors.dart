@@ -2,20 +2,21 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Brand
-  static const primary = Color(0xFFE91E63); // pink
-  static const secondary = Color(0xFF2C0E0E);
+  static const Color primary = Color(0xFFEC1380);
 
-  // Light
-  static const lightBackground = Color(0xFFF6F6F6);
-  static const lightSurface = Colors.white;
-  static const lightText = Colors.black87;
+  // Backgrounds
+  static const Color backgroundLight = Color(0xFFF8F6F7);
+  static const Color backgroundDark = Color(0xFF0A0A0A);
 
-  // Dark
-  static const darkBackground = Color(0xFF121212);
-  static const darkSurface = Color(0xFF1E1E1E);
-  static const darkText = Colors.white70;
+  // Surfaces
+  static const Color surfaceLight = Colors.white;
+  static const Color surfaceDark = Color(0xFF141414);
+
+  // Text
+  static const Color textLight = Colors.black87;
+  static const Color textDark = Colors.white;
 
   // Status
-  static const success = Colors.green;
-  static const error = Colors.red;
+  static const Color error = Colors.red;
+  static const Color success = Colors.green;
 }

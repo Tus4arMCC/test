@@ -6,7 +6,6 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-      debugPrint("cart loaded");
     return const Center(child: Text('Cart', style: TextStyle(fontSize: 22)));
   }
 }

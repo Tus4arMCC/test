@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'bottom_nav.dart';
+
 import '../screens/home_screen.dart';
 import '../screens/explore_screen.dart';
 import '../screens/cart_screen.dart';
+import '../screens/wishlist_screen.dart';
 import '../screens/profile_screen.dart';
+
+import '../../common/navigation/app_bottom_navbar.dart';
+import '../../common/navigation/bottom_nav_item.dart';
 
 class MainTabScreen extends StatefulWidget {
   const MainTabScreen({super.key});
@@ -13,24 +17,38 @@ class MainTabScreen extends StatefulWidget {
 }
 
 class _MainTabScreenState extends State<MainTabScreen> {
-  int _index = 0;
+  int _currentIndex = 0;
 
-  final _pages = const [
+  final List<Widget> _pages = const [
     HomeScreen(),
     ExploreScreen(),
     CartScreen(),
-    ProfileScreen(),
+    WishlistScreen(),
+    ProfileScreen(), // ✅ THIS is your profile UI
   ];
 
   @override
   Widget build(BuildContext context) {
-            debugPrint("main_tab loaded");
-
     return Scaffold(
-      body: _pages[_index],
-      bottomNavigationBar: AppBottomNav(
-        currentIndex: _index,
-        onTap: (value) => setState(() => _index = value),
+      body: _pages[_currentIndex], // ✅ REAL PAGE, NO PAGE NUMBER
+
+      bottomNavigationBar: AppBottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() => _currentIndex = index);
+        },
+        items: const [
+          BottomNavItem(icon: Icons.home, label: "Home"),
+          BottomNavItem(icon: Icons.search, label: "Explore"),
+          BottomNavItem(
+            icon: Icons.shopping_bag,
+            label: "Cart",
+            isBig: true,
+            badgeCount: 2,
+          ),
+          BottomNavItem(icon: Icons.favorite, label: "Wishlist"),
+          BottomNavItem(icon: Icons.person, label: "Profile"),
+        ],
       ),
     );
   }

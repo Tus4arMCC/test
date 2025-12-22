@@ -12,8 +12,6 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("bottom_nav loaded");
-
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,

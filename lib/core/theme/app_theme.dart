@@ -9,19 +9,33 @@ class AppTheme {
     colorScheme: ColorScheme.fromSeed(
       seedColor: AppColors.primary,
       brightness: Brightness.light,
+      background: AppColors.backgroundLight,
+      surface: AppColors.surfaceLight,
+      error: AppColors.error,
     ),
 
-    scaffoldBackgroundColor: AppColors.lightBackground,
+    scaffoldBackgroundColor: AppColors.backgroundLight,
 
     appBarTheme: const AppBarTheme(
+      backgroundColor: AppColors.backgroundLight,
+      foregroundColor: AppColors.textLight,
       elevation: 0,
+    ),
+
+    textTheme: const TextTheme(
+      titleLarge: TextStyle(
+        color: AppColors.textLight,
+        fontWeight: FontWeight.bold,
+      ),
+      bodyMedium: TextStyle(color: AppColors.textLight),
     ),
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.lightSurface,
+      fillColor: AppColors.surfaceLight,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
       ),
     ),
 
@@ -29,9 +43,12 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        disabledBackgroundColor: Colors.grey,
+        disabledForegroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
         ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     ),
   );
@@ -43,19 +60,33 @@ class AppTheme {
     colorScheme: ColorScheme.fromSeed(
       seedColor: AppColors.primary,
       brightness: Brightness.dark,
+      background: AppColors.backgroundDark,
+      surface: AppColors.surfaceDark,
+      error: AppColors.error,
     ),
 
-    scaffoldBackgroundColor: AppColors.darkBackground,
+    scaffoldBackgroundColor: AppColors.backgroundDark,
 
     appBarTheme: const AppBarTheme(
+      backgroundColor: AppColors.backgroundDark,
+      foregroundColor: AppColors.textDark,
       elevation: 0,
+    ),
+
+    textTheme: const TextTheme(
+      titleLarge: TextStyle(
+        color: AppColors.textDark,
+        fontWeight: FontWeight.bold,
+      ),
+      bodyMedium: TextStyle(color: AppColors.textDark),
     ),
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.darkSurface,
+      fillColor: AppColors.surfaceDark,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
       ),
     ),
 
@@ -63,9 +94,12 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
+        disabledBackgroundColor: Colors.grey,
+        disabledForegroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
         ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     ),
   );
