@@ -19,6 +19,7 @@ void main() async {
   await Hive.initFlutter();
 
   // ✅ REGISTER HIVE ADAPTERS
+  Hive.registerAdapter(ProductImageAdapter());
   Hive.registerAdapter(ProductTagAdapter());
   Hive.registerAdapter(ProductAdapter());
 

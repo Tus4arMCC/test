@@ -66,7 +66,7 @@ class Product {
   }
 }
 
-@HiveType(typeId: 2)
+@HiveType(typeId: 3)
 class ProductImage {
   @HiveField(0)
   final String image;

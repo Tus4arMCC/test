@@ -1,0 +1,4 @@
+# Custom Dictionary Words
+cupertino_icons
+myapp
+flutter_dotenv
