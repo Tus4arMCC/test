@@ -24,12 +24,23 @@ class _ProductCardState extends State<ProductCard> {
     isFav = widget.product.isFavourite;
   }
 
+  /// Pick primary image (future-proof)
+  String? get _imageUrl {
+    if (widget.product.images.isEmpty) return null;
+    return widget.product.images
+        .firstWhere(
+          (e) => e.primary,
+          orElse: () => widget.product.images.first,
+        )
+        .image;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final imageUrl = widget.product.givesPrimaryImage();
 
-    return GestureDetector(
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
       onTap: widget.onTap,
       child: SizedBox(
         width: 160,
@@ -43,39 +54,74 @@ class _ProductCardState extends State<ProductCard> {
                   borderRadius: BorderRadius.circular(16),
                   child: AspectRatio(
                     aspectRatio: 3 / 4,
-                    child: imageUrl != null
+                    child: _imageUrl != null
                         ? Image.network(
-                            imageUrl,
+                            _imageUrl!,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
-                                const Icon(Icons.image_not_supported),
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) return child;
+                              return Container(
+                                color: theme.colorScheme.surfaceVariant,
+                              );
+                            },
+                            errorBuilder: (_, __, ___) => Container(
+                              color: theme.colorScheme.surfaceVariant,
+                              child: const Icon(Icons.image_not_supported),
+                            ),
                           )
-                        : const ColoredBox(
-                            color: Colors.grey,
-                            child: Icon(Icons.image),
+                        : Container(
+                            color: theme.colorScheme.surfaceVariant,
+                            child: const Icon(Icons.image),
                           ),
                   ),
                 ),
+
+                /// OUT OF STOCK OVERLAY (optional)
+                if (widget.product.isOutOfStock)
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        "Out of Stock",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
 
                 /// LIKE BUTTON
                 Positioned(
                   top: 8,
                   right: 8,
-                  child: InkWell(
+                  child: GestureDetector(
                     onTap: () {
                       setState(() {
                         isFav = !isFav;
-                        widget.product.isFavourite = isFav;
                       });
+                      // TODO: sync with backend / cache later
                     },
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surface,
                         shape: BoxShape.circle,
+                        boxShadow: const [
+                          BoxShadow(
+                            blurRadius: 6,
+                            color: Colors.black12,
+                          ),
+                        ],
                       ),
                       child: Icon(
-                        isFav ? Icons.favorite : Icons.favorite_border,
+                        isFav
+                            ? Icons.favorite
+                            : Icons.favorite_border,
                         color: isFav
                             ? theme.colorScheme.primary
                             : Colors.grey,
@@ -101,6 +147,8 @@ class _ProductCardState extends State<ProductCard> {
             /// SELLER
             Text(
               widget.product.seller,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall
                   ?.copyWith(color: Colors.grey),
             ),
