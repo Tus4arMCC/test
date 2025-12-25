@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class HeroCarouselItem extends StatelessWidget {
   final String imageUrl;
 
-  const HeroCarouselItem({
-    super.key,
-    required this.imageUrl,
-  });
+  const HeroCarouselItem({super.key, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +14,10 @@ class HeroCarouselItem extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-            ),
+            // Use network image for remote URLs, asset image for local files
+            imageUrl.startsWith('http')
+                ? Image.network(imageUrl, fit: BoxFit.cover)
+                : Image.asset(imageUrl, fit: BoxFit.cover),
 
             // Gradient overlay
             Container(
@@ -28,10 +25,7 @@ class HeroCarouselItem extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.85),
-                    Colors.transparent,
-                  ],
+                  colors: [Colors.black.withOpacity(0.85), Colors.transparent],
                 ),
               ),
             ),
@@ -58,6 +52,7 @@ class HeroCarouselItem extends StatelessWidget {
                         color: Colors.white,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.none,
                         letterSpacing: 0.8,
                       ),
                     ),
@@ -71,6 +66,7 @@ class HeroCarouselItem extends StatelessWidget {
                       color: Colors.white,
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
+                      decoration: TextDecoration.none,
                       height: 1.2,
                     ),
                   ),
@@ -82,6 +78,7 @@ class HeroCarouselItem extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
+                      decoration: TextDecoration.none,
                     ),
                   ),
 
@@ -90,14 +87,17 @@ class HeroCarouselItem extends StatelessWidget {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor:
-                          Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.primary,
+
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
                     onPressed: () {},
-                    child: const Text("Shop Now"),
+                    child: const Text(
+                      "Shop Now",
+                      style: TextStyle(decoration: TextDecoration.none),
+                    ),
                   ),
                 ],
               ),

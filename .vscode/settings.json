@@ -6,5 +6,7 @@
             "addWords": true,
             "scope": "workspace"
         }
-    }
+    },
+    "cmake.ignoreCMakeListsMissing": true,
+    "livePreview.defaultPreviewPath": "/HTML/product-details.html"
 }

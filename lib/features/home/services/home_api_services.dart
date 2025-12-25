@@ -9,7 +9,8 @@ class HomeApiService {
       );
 
       if (res.statusCode == 200) {
-        final data = jsonDecode(res.body) as List;
+        final decoded = jsonDecode(res.body);
+        final data = decoded is List ? decoded : [];
         return data.map((e) => e['imageUrl'] as String).toList();
       }
     } catch (_) {}

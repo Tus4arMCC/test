@@ -24,7 +24,7 @@ class ProductTag {
     return ProductTag(
       tag: (json['tag'] ?? '').toString().trim(),
       order: json['order'] ?? 0,
-      products: (json['products'] as List)
+      products: (json['products'] as List? ?? [])
           .map((e) => Product.fromJson(e))
           .toList(),
     );

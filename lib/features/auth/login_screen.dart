@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'auth_service.dart';
 import '../../common/popup/app_popup.dart';
+import '../../core/storage/auth_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -25,18 +26,26 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordCtrl.text.trim(),
       );
 
-      // 🔴 EXPECTED RESPONSE FORMAT
-      // {
-      //   "messageCode": 100,
-      //   "message": "Login successful"
-      // }
-
       final int messageCode = res['messageCode'] ?? 0;
       final String message = res['message'] ?? 'Something went wrong';
 
       if (!mounted) return;
 
       if (messageCode == 100) {
+        // Save Auth Data
+        final data = res['data'];
+        if (data != null) {
+          final String token = data['token'] ?? "";
+          final String pkToken = data['pksoft_token'] ?? "";
+          final Map<String, dynamic> userModel = data['userModel'] ?? {};
+
+          await AuthStorage.saveLoginData(
+            jwt: token,
+            pkToken: pkToken,
+            userModel: userModel,
+          );
+        }
+
         AppPopup.show(
           context,
           title: "Success",
@@ -46,7 +55,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
         Future.delayed(const Duration(milliseconds: 800), () {
           if (mounted) {
-            Navigator.pushReplacementNamed(context, '/main');
+            // Navigate back to MainTabScreen and clear stack
+            Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
           }
         });
       } else {

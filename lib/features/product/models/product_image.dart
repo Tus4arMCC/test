@@ -1,19 +1,13 @@
 class ProductImage {
-  final bool primary;
   final String image;
-  final int order;
+  final bool primary;
 
-  ProductImage({
-    required this.primary,
-    required this.image,
-    required this.order,
-  });
+  ProductImage({required this.image, required this.primary});
 
   factory ProductImage.fromJson(Map<String, dynamic> json) {
     return ProductImage(
+      image: json['image'],
       primary: json['primary'] ?? false,
-      image: json['image'] ?? '',
-      order: json['order'] ?? 0,
     );
   }
 }

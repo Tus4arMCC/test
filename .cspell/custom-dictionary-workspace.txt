@@ -2,3 +2,5 @@
 cupertino_icons
 myapp
 flutter_dotenv
+skeletion
+surfaceVariant

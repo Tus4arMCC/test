@@ -20,20 +20,35 @@ class HomeRepository {
     /// 2️⃣ HIVE CACHE (if not expired)
     final isExpired = cache.isExpired(_cacheTimeKey, _ttl);
     if (!isExpired) {
-      final hiveData = cache.get<List<ProductTag>>(_cacheKey);
+      final hiveData = cache.get(_cacheKey);
       if (hiveData != null) {
-        cache.setMemory(_cacheKey, hiveData);
-        return hiveData;
+        // Hive may return a List<dynamic> (maps) or List<ProductTag>.
+        // Normalize to List<ProductTag> to avoid invalid cast errors.
+        final List<ProductTag> parsed = hiveData is List<ProductTag>
+            ? hiveData
+            : (hiveData as List).map<ProductTag>((e) {
+                if (e is ProductTag) return e;
+                if (e is Map)
+                  return ProductTag.fromJson(Map<String, dynamic>.from(e));
+                return ProductTag.fromJson(Map<String, dynamic>.from(e as Map));
+              }).toList();
+
+        cache.setMemory(_cacheKey, parsed);
+        return parsed;
       }
     }
 
     /// 3️⃣ API FETCH
     final response = await ProductApiService.fetchHomeProducts();
-    final List list = response['data'];
+    final List list = (response['data'] is List)
+        ? response['data'] as List
+        : [];
 
-    final tags = list
-        .map<ProductTag>((e) => ProductTag.fromJson(e))
-        .toList();
+    final tags = list.map<ProductTag>((e) {
+      if (e is ProductTag) return e;
+      if (e is Map) return ProductTag.fromJson(Map<String, dynamic>.from(e));
+      return ProductTag.fromJson(Map<String, dynamic>.from(e as Map));
+    }).toList();
 
     /// 4️⃣ SAVE TO CACHE
     cache.setMemory(_cacheKey, tags);

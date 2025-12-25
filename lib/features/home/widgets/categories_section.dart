@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/category_api_service.dart';
-import 'category_chip.dart';
+import 'category_item.dart';
 import 'categories_skeleton.dart';
 
 class CategoriesSection extends StatefulWidget {
@@ -40,9 +40,9 @@ class _CategoriesSectionState extends State<CategoriesSection> {
         itemCount: _categories!.length,
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (_, index) {
-          return CategoryChip(
-            label: _categories![index],
-            isActive: index == _activeIndex,
+          return CategoryItem(
+            title: _categories![index],
+            isSelected: index == _activeIndex,
             onTap: () {
               setState(() => _activeIndex = index);
             },
