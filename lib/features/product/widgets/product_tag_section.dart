@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../product/models/product_model.dart';
+import '../../home/models/product_model.dart';
 import '../../product/widgets/product_card.dart';
 import '../screens/product_list_screen.dart';
 
@@ -37,13 +37,11 @@ class ProductTagSection extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ProductListScreen(
-                        title: title,
-                        products: products,
-                      ),
+                      builder: (context) =>
+                          ProductListScreen(title: title, products: products),
                     ),
                   );
-                }, 
+                },
                 child: const Text("See All"),
               ),
             ],
@@ -54,7 +52,7 @@ class ProductTagSection extends StatelessWidget {
 
         /// HORIZONTAL PRODUCT LIST
         SizedBox(
-          height: 290, // ✅ fixes overflow
+          height: 310, // ✅ fixes overflow
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,

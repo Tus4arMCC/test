@@ -3,55 +3,130 @@ import 'package:flutter/material.dart';
 import '../screens/home_screen.dart';
 import '../screens/explore_screen.dart';
 import '../screens/cart_screen.dart';
-import '../wishlist/screens/wishlist_screen.dart';
+import '../screens/wishlist_screen.dart';
 import '../screens/profile_screen.dart';
 
 import '../../common/navigation/app_bottom_navbar.dart';
 import '../../common/navigation/bottom_nav_item.dart';
+import '../home/services/wishlist_api_service.dart';
+import '../home/services/cart_api_service.dart';
+import '../../core/storage/auth_storage.dart';
+import '../../core/state/wishlist_state_manager.dart';
+import '../../core/state/count_state_manager.dart';
 
 class MainTabScreen extends StatefulWidget {
   const MainTabScreen({super.key});
-                            
+
   @override
   State<MainTabScreen> createState() => _MainTabScreenState();
 }
 
 class _MainTabScreenState extends State<MainTabScreen> {
   int _currentIndex = 0;
+  final _wishlistManager = WishlistStateManager();
+  final _countManager = CountStateManager();
 
   final List<Widget> _pages = const [
     HomeScreen(),
     ExploreScreen(),
-    CartScreen(),
-    WishlistScreen(),
-    ProfileScreen(), // ✅ THIS is your profile UI
+    CartScreen(showBackButton: false),
+    WishlistScreen(showBackButton: false),
+    ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize wishlist state when app starts
+    _wishlistManager.initialize();
+    // Initialize counts
+    _countManager.initialize();
+    // Listen to count changes
+    _countManager.addListener(_onCountChanged);
+  }
+
+  void _onCountChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _countManager.removeListener(_onCountChanged);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex], // ✅ REAL PAGE, NO PAGE NUMBER
+      body: _pages[_currentIndex],
 
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentIndex,
-        onTap: (index) {
+        onTap: (index) async {
+          if (index == 2) {
+            final user = await AuthStorage.getUser();
+            final uid =
+                user?['uid'] ??
+                user?['id'] ??
+                user?['code'] ??
+                user?['userName'];
+            if (uid != null) {
+              // Call fetchBag with empty variations as requested
+              CartApiService.fetchBag(uid: uid.toString(), variations: [])
+                  .then((cart) {
+                    // Update count manager with new cart count
+                    _countManager.refresh();
+                  })
+                  .catchError((e) {
+                    debugPrint("Error fetching bag on tab switch: $e");
+                  });
+            }
+          } else if (index == 3) {
+            final user = await AuthStorage.getUser();
+            final variationCode = await AuthStorage.getVariationCode();
+            final uid =
+                user?['uid'] ??
+                user?['id'] ??
+                user?['code'] ??
+                user?['userName'];
+
+            if (uid != null) {
+              WishlistApiService.syncChecklist(
+                    uid: uid.toString(),
+                    variationCode: variationCode,
+                  )
+                  .then((_) {
+                    // Refresh counts after syncing
+                    _countManager.refresh();
+                  })
+                  .catchError((e) {
+                    debugPrint("Error syncing checklist: $e");
+                  });
+            }
+          }
           setState(() => _currentIndex = index);
         },
-        items: const [
-          BottomNavItem(icon: Icons.home, label: "Home"),
-          BottomNavItem(icon: Icons.search, label: "Explore"),
+        items: [
+          const BottomNavItem(icon: Icons.home, label: "Home"),
+          const BottomNavItem(icon: Icons.search, label: "Explore"),
           BottomNavItem(
             icon: Icons.shopping_bag,
             label: "Cart",
             isBig: true,
-            badgeCount: 2,
+            badgeCount: _countManager.cartCount > 0
+                ? _countManager.cartCount
+                : null,
           ),
           BottomNavItem(
-            icon: Icons.favorite, 
+            icon: Icons.favorite,
             label: "Wishlist",
-            badgeCount: 4, 
+            badgeCount: _countManager.wishlistCount > 0
+                ? _countManager.wishlistCount
+                : null,
           ),
-          BottomNavItem(icon: Icons.person, label: "Profile"),
+          const BottomNavItem(icon: Icons.person, label: "Profile"),
         ],
       ),
     );

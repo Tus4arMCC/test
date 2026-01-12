@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'features/product/models/product_model.dart';
-import 'features/product/models/product_tag_model.dart';
-import 'features/product/models/product_image_model.dart';
+import 'features/home/models/product_model.dart';
+import 'features/home/models/product_tag_model.dart';
+import 'features/home/models/product_image_model.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
 import 'core/cache/cache_manager.dart';
+import 'core/utils/cookie_utils.dart';
 import 'app/routes.dart';
 
 void main() async {
@@ -15,6 +16,13 @@ void main() async {
 
   await dotenv.load(fileName: ".env");
   await Hive.initFlutter();
+
+  // ✅ Initialize CookieUtils for user identification
+  try {
+    await CookieUtils.init();
+  } catch (e) {
+    debugPrint('Error initializing CookieUtils: $e');
+  }
 
   // ✅ REGISTER HIVE ADAPTERS
   Hive.registerAdapter(ProductImageAdapter());
@@ -34,7 +42,9 @@ class MyApp extends StatelessWidget {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: ThemeController.themeMode,
       builder: (_, mode, __) {
-        final currentTheme = mode == ThemeMode.dark ? AppTheme.darkTheme : AppTheme.lightTheme;
+        final currentTheme = mode == ThemeMode.dark
+            ? AppTheme.darkTheme
+            : AppTheme.lightTheme;
 
         return MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -63,7 +73,7 @@ class MyApp extends StatelessWidget {
                 );
               },
               child: AnimatedTheme(
-                key: ValueKey(mode), 
+                key: ValueKey(mode),
                 data: currentTheme,
                 // Synchronized duration for a cohesive "liquid" color Morph
                 duration: const Duration(milliseconds: 700),

@@ -8,5 +8,6 @@
         }
     },
     "cmake.ignoreCMakeListsMissing": true,
-    "livePreview.defaultPreviewPath": "/HTML/product-details.html"
+    "livePreview.defaultPreviewPath": "/HTML/product-details.html",
+    "postman.settings.dotenv-detection-notification-visibility": false
 }

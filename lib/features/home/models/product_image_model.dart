@@ -10,15 +10,12 @@ class ProductImage {
   @HiveField(1)
   final bool primary;
 
-  ProductImage({
-    required this.image,
-    required this.primary,
-  });
+  ProductImage({required this.image, required this.primary});
 
   factory ProductImage.fromJson(Map<String, dynamic> json) {
     return ProductImage(
       image: json['image'] ?? '',
-      primary: json['primary'] ?? false,
+      primary: json['isPrimary'] ?? false,
     );
   }
 }

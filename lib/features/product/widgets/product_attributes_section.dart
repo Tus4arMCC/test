@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/product_attribute_model.dart';
+import '../../home/models/product_attribute_model.dart';
 
 class ProductAttributesSection extends StatelessWidget {
-  final List<ProductAttribute> attributes;
+  final List<ProductAttribute> attributes;  
 
   const ProductAttributesSection({super.key, required this.attributes});
 

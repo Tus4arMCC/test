@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import '../../../core/storage/auth_storage.dart';
+import '../../../core/constants/api_urls.dart';
 
 class CategoryApiService {
-    static final String _baseUrl =
-      dotenv.env['API_BASE_URL'] ?? '';
+  static final String _baseUrl = dotenv.env['API_BASE_URL'] ?? '';
   static const _fallback = [
     "All",
     "Dresses",
@@ -17,7 +18,8 @@ class CategoryApiService {
   static Future<List<String>> fetchCategories() async {
     try {
       final res = await http.get(
-        Uri.parse("$_baseUrl/api/pk/Customer/load/category"),
+        Uri.parse("$_baseUrl/${PkSoftUrls.customer.category}"),
+        headers: await AuthStorage.getHeaders(),
       );
 
       if (res.statusCode == 200) {

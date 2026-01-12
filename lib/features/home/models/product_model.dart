@@ -32,6 +32,9 @@ class Product {
   @HiveField(8)
   final List<ProductImage> images;
 
+  @HiveField(9)
+  final double rating;
+
   Product({
     required this.code,
     required this.name,
@@ -42,6 +45,7 @@ class Product {
     required this.seller,
     required this.isOutOfStock,
     required this.images,
+    this.rating = 0.0,
   });
 
   /// ✅ Primary image helper
@@ -54,8 +58,15 @@ class Product {
   factory Product.fromJson(Map<String, dynamic> json) {
     final imagesJson = json['images'] as List? ?? [];
 
+    // ✅ Get the product code - prioritize variationCode since that's what the API uses
+    final productCode = (json['variationCode'] as String?)?.isNotEmpty == true
+        ? json['variationCode']
+        : (json['code'] as String?)?.isNotEmpty == true
+        ? json['code']
+        : '';
+
     return Product(
-      code: json['code'] ?? '',
+      code: productCode,
       name: json['product'] ?? '',
       mrp: (json['mrp'] ?? 0).toDouble(),
       price: (json['price'] ?? 0).toDouble(),
@@ -63,9 +74,8 @@ class Product {
       isInCart: json['isInCart'] ?? false,
       seller: json['seller'] ?? '',
       isOutOfStock: json['isOutOfStock'] ?? false,
-      images: imagesJson
-          .map((e) => ProductImage.fromJson(e))
-          .toList(),
+      images: imagesJson.map((e) => ProductImage.fromJson(e)).toList(),
+      rating: (json['rating'] ?? 0).toDouble(),
     );
   }
 }

@@ -1,26 +1,23 @@
 import '../../../core/cache/cache_manager.dart';
-import '../models/product_detail_model.dart';
-import '../services/product_api_service.dart';
+import '../../home/models/product_data_model.dart';
+import '../../home/services/product_detail_api_service.dart';
 
 class ProductRepository {
   static const _cachePrefix = "product_detail_";
 
-  Future<ProductDetail> getProduct(String code) async {
+  Future<ProductData> getProduct(String code) async {
     final cacheKey = "$_cachePrefix$code";
 
     // ✅ MEMORY CACHE ONLY
-    ///
-    /// Otherwise, a call is made to the ProductApiService to fetch the product and it is saved to the memory cache
-    /// before being returned.
-    final memory = CacheManager.instance.getMemory<ProductDetail>(cacheKey);
+    final memory = CacheManager.instance.getMemory<ProductData>(cacheKey);
     if (memory != null) return memory;
 
     // 🌐 API
-    final product = await ProductApiService.fetchProduct(code);
+    final productData = await ProductApiService.fetchProduct(code);
 
     // ✅ Save to memory only
-    CacheManager.instance.setMemory(cacheKey, product);
+    CacheManager.instance.setMemory(cacheKey, productData);
 
-    return product;
+    return productData;
   }
 }

@@ -3,10 +3,11 @@ import '../home/widgets/hero_carousel.dart';
 import '../home/widgets/categories_section.dart';
 import '../product/widgets/product_card.dart';
 import '../home/repositories/home_repository.dart';
-import '../product/models/product_tag_model.dart';
-import '../product/models/product_model.dart';
+import '../home/models/product_tag_model.dart';
+import '../home/models/product_model.dart';
 import '../product/widgets/product_tag_section.dart';
-// import '.././core/cache/cache_manager.dart';
+import '../home/widgets/features_section.dart';
+import '../home/widgets/review_carousel.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -68,6 +69,11 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
         ),
+        const SizedBox(height: 32),
+        const FeaturesSection(),
+        const SizedBox(height: 32),
+        const ReviewCarousel(),
+        const SizedBox(height: 32),
       ],
     );
   }

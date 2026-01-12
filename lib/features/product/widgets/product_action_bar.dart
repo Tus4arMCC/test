@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/product_detail_model.dart';
+import '../../home/models/product_data_model.dart';
 
 class ProductActionBar extends StatelessWidget {
-  final ProductDetail product;
+  final ProductData product;
 
   const ProductActionBar({super.key, required this.product});
 
@@ -26,14 +26,14 @@ class ProductActionBar extends StatelessWidget {
         children: [
           Expanded(
             child: OutlinedButton(
-              onPressed: product.isOutOfStock ? null : () {},
+              onPressed: product.product.isOutOfStock ? null : () {},
               child: const Text("Add to Cart"),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton(
-              onPressed: product.isOutOfStock ? null : () {},
+              onPressed: product.product.isOutOfStock ? null : () {},
               child: const Text("Buy Now"),
             ),
           ),

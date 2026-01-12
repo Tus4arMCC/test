@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../core/widgets/app_image.dart';
 import '../../../core/utils/image_utils.dart';
-import '../models/product_model.dart';
+import '../../../core/widgets/wishlist_button.dart';
+import '../../home/models/product_model.dart';
 import '../screens/product_detail_screen.dart';
 
 class ProductCard extends StatefulWidget {
@@ -51,8 +52,8 @@ class _ProductCardState extends State<ProductCard> {
               },
               child: Stack(
                 children: [
-                   // Image Container
-                   ClipRRect(
+                  // Image Container
+                  ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: AspectRatio(
                       aspectRatio: 3 / 4,
@@ -64,30 +65,27 @@ class _ProductCardState extends State<ProductCard> {
                     ),
                   ),
 
-                  /// LIKE BUTTON
+                  /// WISHLIST BUTTON
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: Material(
-                      color: theme.colorScheme.surface,
-                      shape: const CircleBorder(),
-                      elevation: 2,
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: () {
-                          setState(() => isFav = !isFav);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(6),
-                          child: Icon(
-                            isFav ? Icons.favorite : Icons.favorite_border,
-                            size: 18,
-                            color: isFav
-                                ? theme.colorScheme.primary
-                                : Colors.grey,
-                          ),
-                        ),
-                      ),
+                    child: WishlistButton(
+                      variationId: widget.product.code,
+                      isInWishlist: isFav,
+                      productId: widget.product.code,
+                      name: widget.product.name,
+                      image: imageUrl,
+                      price: widget.product.price,
+                      oldPrice: widget.product.mrp,
+
+                      iconSize: 18,
+                      showBackground: true,
+                      backgroundColor: theme.colorScheme.surface,
+                      onWishlistChanged: (isInWishlist) {
+                        setState(() {
+                          isFav = isInWishlist;
+                        });
+                      },
                     ),
                   ),
 
@@ -130,6 +128,38 @@ class _ProductCardState extends State<ProductCard> {
           ),
 
           const SizedBox(height: 4),
+
+          // Rating Badge
+          if (widget.product.rating > 0)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: widget.product.rating < 2.6
+                      ? Colors.red
+                      : widget.product.rating < 3.6
+                      ? Colors.amber
+                      : Colors.green,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.product.rating.toStringAsFixed(1),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    const Icon(Icons.star, size: 10, color: Colors.white),
+                  ],
+                ),
+              ),
+            ),
 
           /// PRICE
           Row(
