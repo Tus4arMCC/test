@@ -65,6 +65,49 @@ class _MainTabScreenState extends State<MainTabScreen> {
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _currentIndex,
         onTap: (index) async {
+          // If clicking the same tab, refresh the page
+          if (index == _currentIndex) {
+            // Refresh count API
+            await _countManager.refresh();
+
+            // Refresh specific page data
+            if (index == 2) {
+              // Cart page refresh
+              final user = await AuthStorage.getUser();
+              final uid =
+                  user?['uid'] ??
+                  user?['id'] ??
+                  user?['code'] ??
+                  user?['userName'];
+              if (uid != null) {
+                await CartApiService.fetchBag(
+                  uid: uid.toString(),
+                  variations: [],
+                );
+              }
+            } else if (index == 3) {
+              // Wishlist page refresh
+              final user = await AuthStorage.getUser();
+              final variationCode = await AuthStorage.getVariationCode();
+              final uid =
+                  user?['uid'] ??
+                  user?['id'] ??
+                  user?['code'] ??
+                  user?['userName'];
+              if (uid != null) {
+                await WishlistApiService.syncChecklist(
+                  uid: uid.toString(),
+                  variationCode: variationCode,
+                );
+              }
+            }
+            if (mounted) {
+              setState(() {});
+            }
+            return;
+          }
+
+          // Normal tab switching logic
           if (index == 2) {
             final user = await AuthStorage.getUser();
             final uid =

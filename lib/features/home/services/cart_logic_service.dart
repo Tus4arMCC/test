@@ -27,15 +27,21 @@ class CartLogicService with ChangeNotifier {
 
     try {
       final uid = await CookieUtils.resolveUid();
+      final userType = await CookieUtils.getUserType();
 
       // Get variations from cookie
       final cartCookie = await CookieUtils.getCartCookie();
       final variations = _parseCartCookie(cartCookie);
 
-      if (variations.isEmpty) {
+      // For authenticated and guest users: ALWAYS try to fetch from API
+      // The server will return all their bag items regardless of cookie state
+      // For random users: Only fetch if there are items in the local cookie
+      if (variations.isEmpty && userType == 'random') {
         _cart = Cart.empty();
       } else {
         // Fetch bag data from API
+        // For auth/guest: variations will be empty, API returns all items
+        // For random: variations has the items they added locally
         _cart = await CartApiService.fetchBag(uid: uid, variations: variations);
       }
     } catch (e) {
@@ -85,16 +91,26 @@ class CartLogicService with ChangeNotifier {
   }
 
   /// Add item to cart
-  /// For Random users: updates local state and debounces API call
-  /// For Guest/Auth users: updates local state and immediately calls API
-  Future<void> addToCart({
+  /// Returns the message from API response
+  Future<String> addToCart({
     required String variationId,
     required int quantity,
     String? mappingCode,
   }) async {
     try {
       final uid = await CookieUtils.resolveUid();
-      final userType = await CookieUtils.getUserType();
+
+      // Call cartAdd API directly
+      final response = await CartApiService.addToCart(
+        uid: uid,
+        variationId: variationId,
+        quantity: quantity,
+        mappingCode: mappingCode,
+      );
+
+      if (!response.success) {
+        throw Exception(response.message);
+      }
 
       // Update local cart cookie
       await _updateCartCookie(
@@ -104,62 +120,61 @@ class CartLogicService with ChangeNotifier {
         mappingCode: mappingCode,
       );
 
-      // For random users, debounce the stock check
-      if (userType == 'random') {
-        _debounceTimer?.cancel();
-        _debounceTimer = Timer(const Duration(milliseconds: 800), () async {
-          await _checkStockStatus(uid);
-        });
-      } else {
-        // For auth/guest users, immediately check stock
-        await _checkStockStatus(uid);
-      }
-
-      // Refresh cart display
-      await initializeCart();
+      return response.message;
     } catch (e) {
       _error = 'Failed to add to cart: $e';
       notifyListeners();
+      rethrow;
     }
   }
 
   /// Update quantity of cart item
-  Future<void> updateQuantity({
+  Future<String> updateQuantity({
     required String variationId,
     required int newQuantity,
   }) async {
     try {
       if (newQuantity <= 0) {
-        await removeFromCart(variationId);
-        return;
+        return await removeFromCart(variationId);
       }
 
       final uid = await CookieUtils.resolveUid();
-      final userType = await CookieUtils.getUserType();
 
-      // Update local cart cookie. MappingCode is not needed for update as it should exist.
-      await _updateCartCookie(variationId, newQuantity, isAdd: false);
+      // Get mappingCode from cookie
+      final cartCookie = await CookieUtils.getCartCookie();
+      final variations = _parseCartCookie(cartCookie);
+      final item = variations.firstWhere(
+        (v) => v.variationId == variationId,
+        orElse: () => CartVariation(variationId: '', quantity: 0),
+      );
+      final mappingCode = item.mappingCode;
 
-      // Debounce stock check for random users
-      if (userType == 'random') {
-        _debounceTimer?.cancel();
-        _debounceTimer = Timer(const Duration(milliseconds: 800), () async {
-          await _checkStockStatus(uid);
-        });
-      } else {
-        await _checkStockStatus(uid);
+      // Call cartAdd API with new quantity
+      final response = await CartApiService.addToCart(
+        uid: uid,
+        variationId: variationId,
+        quantity: newQuantity,
+        mappingCode: mappingCode,
+      );
+
+      if (!response.success) {
+        throw Exception(response.message);
       }
 
-      // Refresh cart
-      await initializeCart();
+      // Update local cart cookie
+      await _updateCartCookie(variationId, newQuantity, isAdd: false);
+
+      return response.message;
     } catch (e) {
       _error = 'Failed to update quantity: $e';
       notifyListeners();
+      rethrow;
     }
   }
 
   /// Remove item from cart
-  Future<void> removeFromCart(String variationId) async {
+  /// Returns the message from API response
+  Future<String> removeFromCart(String variationId) async {
     try {
       final uid = await CookieUtils.resolveUid();
 
@@ -172,21 +187,25 @@ class CartLogicService with ChangeNotifier {
       );
       final mappingCode = item.mappingCode;
 
-      // Remove from local cookie
-      await _removeFromCartCookie(variationId);
-
-      // Call API
-      await CartApiService.removeFromCart(
+      // Call cartRemove API
+      final response = await CartApiService.removeFromCart(
         uid: uid,
         variationId: variationId,
         mappingCode: mappingCode,
       );
 
-      // Refresh cart
-      await initializeCart();
+      if (!response.success) {
+        throw Exception(response.message);
+      }
+
+      // Remove from local cookie
+      await _removeFromCartCookie(variationId);
+
+      return response.message;
     } catch (e) {
       _error = 'Failed to remove from cart: $e';
       notifyListeners();
+      rethrow;
     }
   }
 
@@ -210,27 +229,31 @@ class CartLogicService with ChangeNotifier {
             (item) => CartVariation(
               variationId: item.variationId,
               quantity: item.quantity,
-              // We might need mappingCode here too but CartProduct doesn't fully expose it
-              // unless we map it from the cart cookie if locally available.
-              // For now assuming backend knows mapping from variationId or it's not critical for checkout step 1.
             ),
           )
           .toList();
 
       // Call API
-      final token = await CartApiService.proceedOrder(
+      final tokenResponse = await CartApiService.proceedOrder(
         uid: uid,
         variations: selectedVariations,
         mode: mode,
         addressCode: addressCode,
       );
 
-      if (token == null) {
+      if (tokenResponse == null) {
         throw Exception('No token received from server');
       }
 
+      // Extract token string from response
+      final token =
+          tokenResponse['token'] as String? ?? tokenResponse.toString();
+      if (token.isEmpty) {
+        throw Exception('Invalid token received from server');
+      }
+
       // Finalize order
-      await CartApiService.finalizeOrder(token: token, uid: uid, mode: mode);
+      await CartApiService.finalizeOrder(token: token, uid: uid);
 
       // Remove purchased items from cart cookie
       for (var variationId in selectedVariationIds) {
@@ -240,7 +263,7 @@ class CartLogicService with ChangeNotifier {
       // Refresh cart
       await initializeCart();
 
-      return token;
+      return token as String;
     } catch (e) {
       _error = 'Checkout failed: $e';
       notifyListeners();

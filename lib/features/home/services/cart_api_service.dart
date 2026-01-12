@@ -5,11 +5,20 @@ import '../../../core/storage/auth_storage.dart';
 import '../../../core/constants/api_urls.dart';
 import '../models/cart_wishlist_models.dart';
 
+/// Response model for cart API operations
+class CartApiResponse {
+  final bool success;
+  final String message;
+
+  CartApiResponse({required this.success, required this.message});
+}
+
 class CartApiService {
   static final String _baseUrl = dotenv.env['API_BASE_URL'] ?? '';
 
   /// Fetch bag (cart) data from server
   /// Sends UID and variations to get cart details with prices and stock status
+  /// For authenticated/guest users, variations can be empty to fetch all their bag items
   static Future<Cart> fetchBag({
     required String uid,
     required List<CartVariation> variations,
@@ -36,16 +45,24 @@ class CartApiService {
         if (data['messageCode'] == 100 || data['code'] == 100) {
           final fetchedCart = Cart.fromJson(data);
 
-          // Merge quantities from local request into fetched items
-          // API doesn't return quantity, so we must restore it from our request
-          final quantityMap = {
-            for (var v in variations) v.variationId: v.quantity,
-          };
+          // Only merge quantities if variations were provided
+          // For auth/guest users with empty variations, API returns complete items
+          List<CartProduct> updatedItems;
+          if (variations.isNotEmpty) {
+            // Merge quantities from local request into fetched items
+            // API doesn't return quantity, so we must restore it from our request
+            final quantityMap = {
+              for (var v in variations) v.variationId: v.quantity,
+            };
 
-          final updatedItems = fetchedCart.items.map((item) {
-            final qty = quantityMap[item.variationId] ?? 1;
-            return item.copyWith(quantity: qty);
-          }).toList();
+            updatedItems = fetchedCart.items.map((item) {
+              final qty = quantityMap[item.variationId] ?? 1;
+              return item.copyWith(quantity: qty);
+            }).toList();
+          } else {
+            // For auth/guest users: API returns the complete bag, use as-is
+            updatedItems = fetchedCart.items;
+          }
 
           // Recalculate totals with correct quantities
           final subtotal = updatedItems.fold<double>(
@@ -120,23 +137,36 @@ class CartApiService {
   }
 
   /// Proceed with order (checkout)
-  /// Returns a token if successful
-  static Future<String?> proceedOrder({
+  /// Returns the server `data` object (contains `token`, `orderNo`, etc.) on success
+  static Future<Map<String, dynamic>?> proceedOrder({
     required String uid,
     required List<CartVariation> variations,
     required String mode,
     required String addressCode,
   }) async {
     try {
-      final uri = Uri.parse('$_baseUrl/${PkSoftUrls.customer.cart}');
+      // Only allow two modes: 'online' and 'cod'
+      if (mode != 'online' && mode != 'cod') {
+        throw ArgumentError("Invalid mode. Allowed values: 'online' or 'cod'.");
+      }
+
+      final uri = Uri.parse('$_baseUrl/${PkSoftUrls.order.proceed}');
 
       final payload = {
         'uid': uid,
         'variations': variations
-            .map((v) => {'variationId': v.variationId, 'quantity': v.quantity})
+            .map(
+              (v) => {
+                'mappingCode': v.mappingCode ?? v.variationId,
+                'qty': v.quantity,
+                'isOutOfStock': false,
+              },
+            )
             .toList(),
-        'mode': mode,
+        // Backend expects numeric mode: cod=1, online=2
+        'mode': (mode == 'online') ? 2 : 1,
         'addressCode': addressCode,
+        'd': _getEncodedTimestamp(),
       };
 
       final response = await http.post(
@@ -146,17 +176,19 @@ class CartApiService {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
 
-        // Check response code
-        final code = data['code'] ?? 0;
+        // Check response code/messageCode
+        final code = data['code'] ?? data['messageCode'] ?? 0;
         if (code == 100) {
-          // Success - return token
-          return data['token'];
+          final respData = (data['data'] as Map<String, dynamic>?) ?? {};
+          return respData;
         } else if (code == 102) {
           throw Exception('User not verified');
         } else {
-          throw Exception('Order processing failed: ${data['message']}');
+          throw Exception(
+            'Order processing failed: ${data['message'] ?? data['msg']}',
+          );
         }
       } else {
         throw Exception('Failed to proceed order (${response.statusCode})');
@@ -166,20 +198,21 @@ class CartApiService {
     }
   }
 
-  /// Finalize order after token is obtained
+  /// Finalize order after token is obtained by calling `api/pk/Order/success`
+  /// Sends payload: { token, trnxNo, uid, d }
   static Future<bool> finalizeOrder({
     required String token,
     required String uid,
-    required String mode,
+    String? trnxNo,
   }) async {
     try {
-      final uri = Uri.parse('$_baseUrl/${PkSoftUrls.customer.cart}');
+      final uri = Uri.parse('$_baseUrl/${PkSoftUrls.order.success}');
 
       final payload = {
         'token': token,
+        'trnxNo': trnxNo ?? 'string',
         'uid': uid,
-        'mode': mode,
-        'action': 'finalize',
+        'd': _getEncodedTimestamp(),
       };
 
       final response = await http.post(
@@ -189,8 +222,9 @@ class CartApiService {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data['code'] == 100;
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final code = data['code'] ?? data['messageCode'] ?? 0;
+        return code == 100;
       } else {
         throw Exception('Failed to finalize order (${response.statusCode})');
       }
@@ -245,7 +279,7 @@ class CartApiService {
   }
 
   /// Add item to cart
-  static Future<bool> addToCart({
+  static Future<CartApiResponse> addToCart({
     required String uid,
     required String variationId,
     required int quantity,
@@ -269,7 +303,14 @@ class CartApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data['messageCode'] == 100 || data['code'] == 100;
+        final messageCode = data['messageCode'] ?? data['code'] ?? 0;
+        final message = data['message'] ?? 'Operation completed';
+
+        if (messageCode == 100) {
+          return CartApiResponse(success: true, message: message);
+        } else {
+          return CartApiResponse(success: false, message: message);
+        }
       } else {
         throw Exception('Failed to add to cart (${response.statusCode})');
       }
@@ -279,7 +320,7 @@ class CartApiService {
   }
 
   /// Remove item from cart
-  static Future<bool> removeFromCart({
+  static Future<CartApiResponse> removeFromCart({
     required String uid,
     required String variationId,
     String? mappingCode,
@@ -302,7 +343,14 @@ class CartApiService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        return data['messageCode'] == 100 || data['code'] == 100;
+        final messageCode = data['messageCode'] ?? data['code'] ?? 0;
+        final message = data['message'] ?? 'Operation completed';
+
+        if (messageCode == 100) {
+          return CartApiResponse(success: true, message: message);
+        } else {
+          return CartApiResponse(success: false, message: message);
+        }
       } else {
         throw Exception('Failed to remove from cart (${response.statusCode})');
       }

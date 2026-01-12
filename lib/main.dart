@@ -9,6 +9,7 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
 import 'core/cache/cache_manager.dart';
 import 'core/utils/cookie_utils.dart';
+import 'core/state/count_state_manager.dart';
 import 'app/routes.dart';
 
 void main() async {
@@ -30,6 +31,10 @@ void main() async {
   Hive.registerAdapter(ProductAdapter());
 
   await CacheManager.instance.init();
+
+  // ✅ Initialize count API on app startup
+  final countManager = CountStateManager();
+  await countManager.initialize();
 
   runApp(const MyApp());
 }

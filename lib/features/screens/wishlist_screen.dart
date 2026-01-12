@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../home/models/cart_wishlist_models.dart';
 import '../home/services/wishlist_logic_service.dart';
+import '../home/services/cart_api_service.dart';
 import '../../core/widgets/app_image.dart';
+import '../../core/utils/cookie_utils.dart';
 // import 'widgets/like_button.dart'; // Removed
 
 import '../../core/state/wishlist_state_manager.dart';
@@ -17,6 +19,7 @@ class WishlistScreen extends StatefulWidget {
 class _WishlistScreenState extends State<WishlistScreen> {
   late WishlistLogicService _wishlistLogic;
   final _wishlistManager = WishlistStateManager();
+  bool _isMovingToBag = false;
 
   @override
   void initState() {
@@ -357,9 +360,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
-                      onPressed: item.inStock
+                      onPressed: item.inStock && !_isMovingToBag
                           ? () {
-                              // Move to Bag Logic
+                              _handleMoveToCart(item);
                             }
                           : null,
                       style: OutlinedButton.styleFrom(
@@ -367,7 +370,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         side: const BorderSide(color: Color(0xFFDC3545)),
                         padding: const EdgeInsets.symmetric(vertical: 8),
                       ),
-                      child: const Text('MOVE TO BAG'),
+                      child: Text(
+                        item.isInCart ? 'REMOVE FROM BAG' : 'MOVE TO BAG',
+                      ),
                     ),
                   ),
                 ],
@@ -375,6 +380,63 @@ class _WishlistScreenState extends State<WishlistScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Handle move to cart or remove from cart action
+  Future<void> _handleMoveToCart(WishlistItem item) async {
+    try {
+      if (!mounted) return;
+
+      setState(() {
+        _isMovingToBag = true;
+      });
+
+      final uid = await CookieUtils.resolveUid();
+
+      if (item.isInCart) {
+        // Remove from cart
+        await CartApiService.removeFromCart(
+          uid: uid,
+          variationId: item.variationId,
+        );
+
+        _showMessage('Removed from bag', isSuccess: true);
+      } else {
+        // Add to cart
+        await CartApiService.addToCart(
+          uid: uid,
+          variationId: item.variationId,
+          quantity: 1,
+        );
+
+        _showMessage('Added to bag', isSuccess: true);
+      }
+
+      // Refresh wishlist to update the button state
+      if (mounted) {
+        await _wishlistLogic.initializeWishlist();
+      }
+    } catch (e) {
+      _showMessage('Failed to update cart', isSuccess: false);
+      debugPrint('Error updating cart: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isMovingToBag = false;
+        });
+      }
+    }
+  }
+
+  /// Show a snackbar message
+  void _showMessage(String message, {required bool isSuccess}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isSuccess ? Colors.green : Colors.red,
+        duration: const Duration(seconds: 2),
       ),
     );
   }

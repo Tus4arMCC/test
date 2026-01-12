@@ -1,15 +1,19 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../home/models/cart_wishlist_models.dart';
+import '../../home/services/cart_api_service.dart';
+import '../../../core/utils/cookie_utils.dart';
 
 class PaymentScreen extends StatefulWidget {
   final double totalAmount;
   final List<CartProduct> items;
+  final String? addressCode;
 
   const PaymentScreen({
     super.key,
     required this.totalAmount,
     required this.items,
+    this.addressCode,
   });
 
   @override
@@ -40,76 +44,120 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _placeOrder() async {
-    if (_selectedMethod == 'card') {
-      if (_cardNumberController.text.isEmpty ||
-          _cardNameController.text.isEmpty ||
-          _cardExpiryController.text.isEmpty ||
-          _cardCvvController.text.isEmpty) {
+    // Only two payment methods are supported in this screen: 'cod' and 'online'.
+    setState(() => _isLoading = true);
+
+    try {
+      // Resolve UID (user/guest/random)
+      final uid = await CookieUtils.resolveUid();
+
+      // Build variations payload from cart items
+      final variations = widget.items
+          .map(
+            (p) => CartVariation(
+              variationId: p.variationId,
+              quantity: p.quantity,
+              mappingCode: p.mappingCode,
+            ),
+          )
+          .toList();
+
+      // Map selected payment method to allowed modes: 'cod' or 'online'
+      final mode = (_selectedMethod == 'cod') ? 'cod' : 'online';
+
+      // Use passed addressCode if available
+      final addressCode = widget.addressCode ?? '';
+
+      // Call proceedOrder -> returns full response data (token, orderNo)
+      final resp = await CartApiService.proceedOrder(
+        uid: uid,
+        variations: variations,
+        mode: mode,
+        addressCode: addressCode,
+      );
+
+      if (resp == null) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please fill all card details")),
+          const SnackBar(content: Text("Failed to place order. Try again.")),
         );
         return;
       }
-    } else if (_selectedMethod == 'upi' && _upiIdController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please enter UPI ID")));
-      return;
-    } else if (_selectedMethod == 'netbanking' && _selectedBank == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please select a bank")));
-      return;
-    } else if (_selectedMethod == 'wallet' && _selectedWallet == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Please select a wallet")));
-      return;
-    }
 
-    setState(() => _isLoading = true);
+      final token = resp['token'] as String?;
+      final orderNo = resp['orderNo'] as String?;
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
+      if (token == null || token.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Order token missing. Try again.")),
+        );
+        return;
+      }
 
-    if (!mounted) return;
+      // Call success endpoint with token, trnxNo (use orderNo if available)
+      final finalized = await CartApiService.finalizeOrder(
+        token: token,
+        uid: uid,
+        trnxNo: orderNo ?? 'string',
+      );
 
-    final orderId = Random().nextInt(900000) + 100000;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
-        title: const Text("Order Placed Successfully!"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("Your Order ID: #$orderId"),
-            const SizedBox(height: 8),
-            Text("Payment Method: ${_getPaymentMethodName(_selectedMethod)}"),
-            const SizedBox(height: 16),
-            const Text("Thank you for shopping with us!"),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx); // Close dialog
-              // Navigate to Home or Orders
-              Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-            },
-            child: const Text("Continue Shopping"),
+      if (!mounted) return;
+      if (finalized) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            icon: const Icon(Icons.check_circle, color: Colors.green, size: 48),
+            title: const Text("Order Placed Successfully!"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (token.isNotEmpty) Text("Your Order Token: $token"),
+                const SizedBox(height: 8),
+                Text(
+                  "Payment Method: ${_getPaymentMethodName(_selectedMethod)}",
+                ),
+                const SizedBox(height: 16),
+                const Text("Thank you for shopping with us!"),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/',
+                    (route) => false,
+                  );
+                },
+                child: const Text("Continue Shopping"),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to finalize order.")),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Order error: $e")));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   String _getPaymentMethodName(String method) {
     switch (method) {
       case 'cod':
         return 'Cash on Delivery';
+      case 'online':
+        return 'Online Payment';
       case 'card':
         return 'Credit/Debit Card';
       case 'upi':
@@ -177,45 +225,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               'Pay with cash when your order is delivered.',
                         ),
                         _buildPaymentOption(
-                          value: 'card',
-                          icon: Icons.credit_card,
-                          title: 'Credit / Debit Card',
+                          value: 'online',
+                          icon: Icons.payment,
+                          title: 'Online Payment',
                           subtitle:
-                              'We accept Visa, Mastercard, Maestro and Rupay.',
-                        ),
-                        if (_selectedMethod == 'card') _buildCardForm(),
-
-                        _buildPaymentOption(
-                          value: 'upi',
-                          icon: Icons.phone_android,
-                          title: 'UPI / QR',
-                          subtitle: 'Use apps like Google Pay, PhonePe, Paytm.',
-                        ),
-                        if (_selectedMethod == 'upi') _buildUpiForm(),
-
-                        _buildPaymentOption(
-                          value: 'netbanking',
-                          icon: Icons.account_balance,
-                          title: 'Netbanking',
-                          subtitle:
-                              'Internet banking options from major banks.',
-                        ),
-                        if (_selectedMethod == 'netbanking')
-                          _buildNetBankingForm(),
-
-                        _buildPaymentOption(
-                          value: 'wallet',
-                          icon: Icons.account_balance_wallet,
-                          title: 'Wallets',
-                          subtitle: 'Paytm, PhonePe, Mobikwik and more.',
-                        ),
-                        if (_selectedMethod == 'wallet') _buildWalletForm(),
-
-                        _buildPaymentOption(
-                          value: 'emi',
-                          icon: Icons.calendar_today,
-                          title: 'EMI',
-                          subtitle: 'Pay in installments via partner banks.',
+                              'Pay online (cards, UPI, netbanking, wallets).',
                         ),
                       ],
                     ),

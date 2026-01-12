@@ -19,20 +19,8 @@ class _Customer {
   final String checklist = "api/pk/Customer/CheckList"; //{wishlist-list}
   final String bag = "api/pk/Customer/Bag"; //{get cart & wishlist}
 
-  final String wishlist =
-      "api/pk/Customer/wishlist"; //{add/remove from wishlist}
+  final String wishlist ="api/pk/Customer/wishlist"; //{add/remove from wishlist}
   final String cart = "api/pk/Customer/Cart"; //{add/remove from cart}
-
-  // Specific cart actions usually append /add or /remove or use query params?
-  // Looking at previous code, cart addToCart used uri: '$_baseUrl/api/pk/Customer/cart/add'
-  // The provided list has CART: "api/pk/Customer/Cart".
-  // I should check if the previous code used base/cart/add.
-  // The provided JS list might be a subset or base paths.
-  // Wait, the previous code used `api/pk/Customer/cart/add` and `remove`.
-  // The JS provides `CART: "api/pk/Customer/Cart"`.
-  // Maybe the JS provided implies these are the base endpoints.
-  // I will add the specific add/remove ones if they are missing from the request but present in code.
-  // For now I'll stick strictly to what the user provided, and if I need extensions I'll add them to the class.
 
   final String cartAdd = "api/pk/Customer/Cart/add";
   final String cartRemove = "api/pk/Customer/Cart/remove";

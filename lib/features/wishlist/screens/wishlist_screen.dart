@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../home/models/product_model.dart';
-import '../../home/models/product_image_model.dart';
+
 import '../../../core/widgets/app_image.dart';
 import '../../../core/widgets/wishlist_button.dart';
-import 'dart:ui'
-    as ui; // Needed if we re-introduce ImageFilter later, but removing for now
 
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
@@ -30,7 +28,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
         scrolledUnderElevation: 0,
-        backgroundColor: colorScheme.surface.withOpacity(0.95),
+        backgroundColor: colorScheme.surface.withValues(alpha: 0.95),
         centerTitle: true,
         title: Text(
           "My Wishlist",
@@ -85,7 +83,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   height: 36,
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceVariant.withOpacity(0.5),
+                    color: colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.5,
+                    ),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -118,7 +118,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
           : ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: _wishlistItems.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 16),
+              separatorBuilder: (_, index) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
                 return _WishlistGridItem(product: _wishlistItems[index]);
               },
@@ -143,7 +143,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 2,
                     offset: const Offset(0, 1),
                   ),
@@ -200,7 +200,7 @@ class _WishlistGridItem extends StatelessWidget {
                   isInWishlist: true, // Always true in wishlist screen
                   iconSize: 18,
                   showBackground: true,
-                  backgroundColor: Colors.white.withOpacity(0.9),
+                  backgroundColor: Colors.white.withValues(alpha: 0.9),
                   onWishlistChanged: (isInWishlist) {
                     // Item removed from wishlist, could refresh the list here
                   },
@@ -218,7 +218,7 @@ class _WishlistGridItem extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: const Text(

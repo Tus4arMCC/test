@@ -8,10 +8,12 @@ import '../../../core/widgets/wishlist_button.dart';
 import '../../home/models/product_data_model.dart';
 import '../../home/models/variation_model.dart';
 import '../repository/product_repository.dart';
+import '../../home/services/product_detail_api_service.dart';
 
 import '../../home/services/cart_logic_service.dart';
 import '../../../core/state/count_state_manager.dart';
 import '../../screens/cart_screen.dart';
+import '../../screens/wishlist_screen.dart';
 import '../widgets/seller_card.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -37,6 +39,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   bool _localIsInCart = false;
   bool _isCartActionRunning = false;
   late CartLogicService _cartLogic;
+  late CountStateManager _countManager;
   late String _currentProductCode;
 
   // Seller Selection
@@ -51,13 +54,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     super.initState();
     _currentProductCode = widget.productCode;
     _cartLogic = CartLogicService();
-    // Initialize cart logic to ensure we have latest data
-    _cartLogic.initializeCart();
+    _countManager = CountStateManager();
+
+    // Listen to count changes to update badge
+    _countManager.addListener(_onCountChanged);
+
+    // Initialize count manager to get cart/wishlist counts for badges
+    _countManager.initialize();
     _loadProduct();
+  }
+
+  void _onCountChanged() {
+    if (mounted) {
+      setState(() {}); // Rebuild to update badges
+    }
   }
 
   @override
   void dispose() {
+    _countManager.removeListener(_onCountChanged);
     _cartLogic.dispose();
     super.dispose();
   }
@@ -70,7 +85,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
 
     try {
-      final data = await ProductRepository().getProduct(targetCode);
+      // Always fetch fresh data from API (no caching) to get latest price, stock, etc.
+      final data = await ProductApiService.fetchProduct(targetCode);
       _currentProductCode = targetCode;
       _productData = data;
       _selectedVariation = data.product;
@@ -224,7 +240,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
 
     try {
-      await _cartLogic.addToCart(
+      final message = await _cartLogic.addToCart(
         variationId: _selectedVariation!.variationCode,
         quantity: _quantity,
         mappingCode:
@@ -235,22 +251,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       if (mounted) {
         setState(() {
           _localIsInCart = true;
+          // Remove from wishlist when adding to cart (mutually exclusive)
+          _localLiked = false;
           _isCartActionRunning = false;
         });
 
         // Refresh global count
         await CountStateManager().refresh();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Added to cart successfully')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isCartActionRunning = false);
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Failed to add to cart: $e')));
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
   }
@@ -283,11 +301,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
 
     try {
-      await _cartLogic.removeFromCart(_selectedVariation!.variationCode);
+      final message = await _cartLogic.removeFromCart(
+        _selectedVariation!.variationCode,
+      );
 
       if (mounted) {
+        // Reload product to refresh cart/wishlist status from API
+        // This prevents empty screen and ensures fresh state
+        await _loadProduct();
+
         setState(() {
-          _localIsInCart = false;
           _isCartActionRunning = false;
         });
 
@@ -296,16 +319,54 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Removed from cart')));
+        ).showSnackBar(SnackBar(content: Text(message)));
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isCartActionRunning = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to remove from cart: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
+  }
+
+  /// Build badge icon with count
+  Widget _buildBadgeIcon({
+    required IconData icon,
+    required int count,
+    required VoidCallback onPressed,
+  }) {
+    return Stack(
+      children: [
+        IconButton(
+          icon: Icon(icon, color: Colors.black),
+          onPressed: onPressed,
+        ),
+        if (count > 0)
+          Positioned(
+            right: 6,
+            top: 6,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: Color(0xFFDC3545),
+                shape: BoxShape.circle,
+              ),
+              constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+              child: Text(
+                count > 99 ? '99+' : count.toString(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+      ],
+    );
   }
 
   void _showShareModal() {
@@ -437,8 +498,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             icon: const Icon(Icons.qr_code, color: Colors.black),
             onPressed: _showShareModal,
           ),
-          IconButton(
-            icon: const Icon(Icons.shopping_cart_outlined, color: Colors.black),
+          _buildBadgeIcon(
+            icon: Icons.favorite_outline,
+            count: _countManager.wishlistCount,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const WishlistScreen()),
+              );
+            },
+          ),
+          _buildBadgeIcon(
+            icon: Icons.shopping_cart_outlined,
+            count: _countManager.cartCount,
             onPressed: () {
               Navigator.push(
                 context,
@@ -584,18 +656,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                       const Spacer(),
 
-                      // Wishlist Button
-                      WishlistButton(
-                        variationId: product.variationCode,
-                        isInWishlist: _localLiked,
-                        iconSize: 24,
-                        showBackground: true,
-                        backgroundColor: Colors.grey[100],
-                        onWishlistChanged: (isInWishlist) {
-                          setState(() {
-                            _localLiked = isInWishlist;
-                          });
-                        },
+                      // Wishlist Button (disabled if in cart)
+                      Opacity(
+                        opacity: _localIsInCart ? 0.5 : 1.0,
+                        child: IgnorePointer(
+                          ignoring: _localIsInCart,
+                          child: WishlistButton(
+                            variationId: product.variationCode,
+                            isInWishlist: _localLiked,
+                            iconSize: 24,
+                            showBackground: true,
+                            backgroundColor: Colors.grey[100],
+                            onWishlistChanged: (isInWishlist) {
+                              setState(() {
+                                _localLiked = isInWishlist;
+                              });
+                            },
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -1066,7 +1144,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               // Add to Cart
               Expanded(
                 child: OutlinedButton(
-                  onPressed: product.isOutOfStock
+                  onPressed: (product.isOutOfStock || _isCartActionRunning)
                       ? null
                       : () {
                           if (_localIsInCart) {
@@ -1107,7 +1185,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               // Buy Now
               Expanded(
                 child: ElevatedButton(
-                  onPressed: product.isOutOfStock ? null : () {},
+                  onPressed: (product.isOutOfStock || _isCartActionRunning)
+                      ? null
+                      : () {},
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: theme.colorScheme.primary,

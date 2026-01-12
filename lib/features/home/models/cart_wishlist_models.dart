@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 /// Model for a variation in cart/wishlist
 class CartVariation {
   final String variationId;
@@ -42,6 +40,7 @@ class CartProduct {
   final bool inStock;
   final bool isFavourite;
   final String? variant; // e.g., "Blue • Size M"
+  final String? mappingCode;
 
   CartProduct({
     required this.productId,
@@ -55,6 +54,7 @@ class CartProduct {
     required this.inStock,
     this.isFavourite = false,
     this.variant,
+    this.mappingCode,
   });
 
   double get total => price * quantity;
@@ -73,25 +73,55 @@ class CartProduct {
     'inStock': inStock,
     'isFavourite': isFavourite,
     'variant': variant,
+    if (mappingCode != null) 'mappingCode': mappingCode,
   };
 
-  factory CartProduct.fromJson(Map<String, dynamic> json) => CartProduct(
-    productId: json['productCode'] ?? json['productId'] ?? '',
-    variationId: json['variationCode'] ?? json['variationId'] ?? '',
-    name: json['product'] ?? json['name'] ?? 'Unknown',
-    image: json['image'] ?? '',
-    price: (json['price'] ?? 0).toDouble(),
-    oldPrice: json['mrp'] != null
-        ? (json['mrp']).toDouble()
-        : (json['oldPrice'] != null ? (json['oldPrice']).toDouble() : null),
-    quantity: json['quantity'] ?? 1,
-    description: json['description'],
-    inStock: json['isStockOut'] != null
-        ? !(json['isStockOut'] as bool)
-        : (json['inStock'] ?? true),
-    isFavourite: json['isFavourite'] ?? false,
-    variant: json['variant'],
-  );
+  factory CartProduct.fromJson(Map<String, dynamic> json) {
+    final sellerDto = json['sellerPriceDTO'];
+
+    final double? rootPrice = json['price'] != null
+        ? (json['price'] as num).toDouble()
+        : null;
+    final double? dtoPrice = sellerDto != null && sellerDto['price'] != null
+        ? (sellerDto['price'] as num).toDouble()
+        : null;
+
+    final double? rootMrp = json['mrp'] != null
+        ? (json['mrp'] as num).toDouble()
+        : (json['oldPrice'] != null
+              ? (json['oldPrice'] as num).toDouble()
+              : null);
+    final double? dtoMrp = sellerDto != null && sellerDto['mrp'] != null
+        ? (sellerDto['mrp'] as num).toDouble()
+        : null;
+
+    // try to resolve mappingCode from seller DTO or root
+    final String? resolvedMapping =
+        sellerDto != null && sellerDto['mappingCode'] != null
+        ? (sellerDto['mappingCode'] as String)
+        : (json['mappingCode'] as String?) ?? (json['mapping_code'] as String?);
+
+    return CartProduct(
+      productId: json['productCode'] ?? json['productId'] ?? '',
+      variationId: json['variationCode'] ?? json['variationId'] ?? '',
+      name: json['product'] ?? json['name'] ?? 'Unknown',
+      image: json['image'] ?? '',
+      price: rootPrice ?? dtoPrice ?? 0.0,
+      oldPrice: rootMrp ?? dtoMrp,
+      quantity: json['quantity'] ?? 1,
+      description: json['description'],
+      inStock: json['isStockOut'] != null
+          ? !(json['isStockOut'] as bool)
+          : (json['inStock'] ?? true),
+      isFavourite: json['isFavourite'] ?? false,
+      variant:
+          json['variant'] ??
+          (json['variationName'] != null
+              ? (json['variationName'] as String).replaceAll('||', ' ').trim()
+              : null),
+      mappingCode: resolvedMapping,
+    );
+  }
 
   CartProduct copyWith({
     String? productId,
@@ -105,6 +135,7 @@ class CartProduct {
     bool? inStock,
     bool? isFavourite,
     String? variant,
+    String? mappingCode,
   }) {
     return CartProduct(
       productId: productId ?? this.productId,
@@ -118,6 +149,7 @@ class CartProduct {
       inStock: inStock ?? this.inStock,
       isFavourite: isFavourite ?? this.isFavourite,
       variant: variant ?? this.variant,
+      mappingCode: mappingCode ?? this.mappingCode,
     );
   }
 
@@ -222,6 +254,8 @@ class WishlistItem {
   final bool inStock;
   final String? variant;
   final DateTime addedAt;
+  final bool isInCart;
+  final bool isStockOut;
 
   WishlistItem({
     required this.productId,
@@ -233,6 +267,8 @@ class WishlistItem {
     required this.inStock,
     this.variant,
     required this.addedAt,
+    this.isInCart = false,
+    this.isStockOut = false,
   });
 
   Map<String, dynamic> toJson() => {
@@ -245,6 +281,7 @@ class WishlistItem {
     'inStock': inStock,
     'variant': variant,
     'addedAt': addedAt.toIso8601String(),
+    'isInCart': isInCart,
   };
 
   factory WishlistItem.fromJson(Map<String, dynamic> json) {
@@ -264,6 +301,7 @@ class WishlistItem {
       addedAt: json['addedAt'] != null
           ? DateTime.parse(json['addedAt'])
           : DateTime.now(),
+      isInCart: json['isInCart'] ?? false,
     );
   }
 

@@ -3,6 +3,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/skeleton.dart';
 import '../../checkout/screens/payment_screen.dart';
 import '../../home/models/cart_wishlist_models.dart';
+import '../models/address_model.dart';
+import '../services/address_api_service.dart';
 
 class AddressListScreen extends StatefulWidget {
   final bool isSelectionMode;
@@ -22,6 +24,25 @@ class AddressListScreen extends StatefulWidget {
 
 class _AddressListScreenState extends State<AddressListScreen> {
   int _selectedAddressIndex = 0;
+  bool _loading = true;
+  List<AddressModel> _addresses = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAddresses();
+  }
+
+  Future<void> _loadAddresses() async {
+    setState(() => _loading = true);
+    try {
+      _addresses = await AddressApiService.fetchAddresses();
+    } catch (e) {
+      _addresses = [];
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,27 +69,27 @@ class _AddressListScreenState extends State<AddressListScreen> {
           ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
             children: [
-              _buildAddressCard(
-                index: 0,
-                title: "Jane Doe (Home)",
-                address: "123 Fashion Avenue, Apt 4B\nNew York, NY 10012",
-                phone: "(555) 123-4567",
-                icon: Icons.home_rounded,
-                isDefault: true,
-              ),
-              const SizedBox(height: 16),
-              _buildAddressCard(
-                index: 1,
-                title: "Jane Doe (Work)",
-                address: "456 Style Street, Suite 101\nNew York, NY 10018",
-                phone: "(555) 987-6543",
-                icon: Icons.work_rounded,
-                isDefault: false,
-              ),
-              const SizedBox(height: 16),
-              // Skeleton Example
-              _buildSkeletonAddressCard(context),
-              const SizedBox(height: 16),
+              if (_loading) ...[
+                _buildSkeletonAddressCard(context),
+                const SizedBox(height: 16),
+              ] else if (_addresses.isEmpty) ...[
+                const SizedBox(height: 24),
+                Center(child: Text('No addresses found')),
+                const SizedBox(height: 24),
+              ] else ...[
+                for (var i = 0; i < _addresses.length; i++) ...[
+                  _buildAddressCard(
+                    index: i,
+                    title: _addresses[i].name + (i == 0 ? ' (Home)' : ''),
+                    address:
+                        '${_addresses[i].houseNo}, ${_addresses[i].addressLine}\n${_addresses[i].city}, ${_addresses[i].state} - ${_addresses[i].pincode}',
+                    phone: _addresses[i].phone,
+                    icon: Icons.home_rounded,
+                    isDefault: _addresses[i].isDefault,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ],
             ],
           ),
           // Floating Action Button Style Bottom Bar
@@ -89,7 +110,14 @@ class _AddressListScreenState extends State<AddressListScreen> {
                 ),
               ),
               child: ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/address-form'),
+                onPressed: () async {
+                  final result = await Navigator.pushNamed(
+                    context,
+                    '/address-form',
+                  );
+                  // refresh list after returning from add
+                  await _loadAddresses();
+                },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -138,12 +166,16 @@ class _AddressListScreenState extends State<AddressListScreen> {
       onTap: () {
         setState(() => _selectedAddressIndex = index);
         if (widget.isSelectionMode) {
+          final addressCode = (index < _addresses.length)
+              ? _addresses[index].id
+              : '';
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => PaymentScreen(
                 totalAmount: widget.checkoutTotal ?? 0,
                 items: widget.checkoutItems ?? [],
+                addressCode: addressCode,
               ),
             ),
           );

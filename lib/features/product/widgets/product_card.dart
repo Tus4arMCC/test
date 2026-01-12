@@ -58,7 +58,7 @@ class _ProductCardState extends State<ProductCard> {
                     child: AspectRatio(
                       aspectRatio: 3 / 4,
                       child: AppImage(
-                        imageUrl: imageUrl ?? "",
+                        imageUrl: imageUrl,
                         fit: BoxFit.cover,
                         borderRadius: 16,
                       ),

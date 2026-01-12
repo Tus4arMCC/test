@@ -6,12 +6,12 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     primaryColor: AppColors.primary,
-    
+
     // Force canvas and scaffold to be pure to avoid M3 "tinted" backgrounds
     canvasColor: AppColors.backgroundLight,
     scaffoldBackgroundColor: AppColors.backgroundLight,
     cardColor: AppColors.surfaceLight,
-    
+
     colorScheme: ColorScheme.light(
       primary: AppColors.primary,
       onPrimary: Colors.white,
@@ -19,12 +19,11 @@ class AppTheme {
       onPrimaryContainer: Colors.white,
       secondary: AppColors.primary,
       onSecondary: Colors.white,
-      secondaryContainer: AppColors.primary.withOpacity(0.1),
+      secondaryContainer: AppColors.primary.withValues(alpha: 0.1),
       onSecondaryContainer: AppColors.primary,
       surface: AppColors.surfaceLight,
       onSurface: AppColors.textLight,
-      background: AppColors.backgroundLight,
-      onBackground: AppColors.textLight,
+      // background and onBackground removed as they are deprecated and surface is already defined
       error: AppColors.error,
       onError: Colors.white,
       surfaceTint: Colors.transparent, // Disable the M3 surface tinting
@@ -41,14 +40,18 @@ class AppTheme {
     // Force ALL buttons to use the exact brand color
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(AppColors.primary),
-        foregroundColor: MaterialStateProperty.all(Colors.white),
-        elevation: MaterialStateProperty.all(0),
-        shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
-        padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 24, vertical: 14)),
+        backgroundColor: WidgetStateProperty.all(AppColors.primary),
+        foregroundColor: WidgetStateProperty.all(Colors.white),
+        elevation: WidgetStateProperty.all(0),
+        shape: WidgetStateProperty.all(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+        padding: WidgetStateProperty.all(
+          const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        ),
       ),
     ),
-    
+
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.primary,
@@ -58,9 +61,7 @@ class AppTheme {
     ),
 
     textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: AppColors.primary,
-      ),
+      style: TextButton.styleFrom(foregroundColor: AppColors.primary),
     ),
 
     // Force BottomNavigationBar to use exact primary
@@ -72,8 +73,15 @@ class AppTheme {
     ),
 
     textTheme: const TextTheme(
-      titleLarge: TextStyle(color: AppColors.textLight, fontWeight: FontWeight.bold, fontSize: 20),
-      titleMedium: TextStyle(color: AppColors.textLight, fontWeight: FontWeight.w600),
+      titleLarge: TextStyle(
+        color: AppColors.textLight,
+        fontWeight: FontWeight.bold,
+        fontSize: 20,
+      ),
+      titleMedium: TextStyle(
+        color: AppColors.textLight,
+        fontWeight: FontWeight.w600,
+      ),
       bodyLarge: TextStyle(color: AppColors.textLight),
       bodyMedium: TextStyle(color: AppColors.textLight),
       bodySmall: TextStyle(color: Colors.grey),
@@ -84,7 +92,7 @@ class AppTheme {
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     primaryColor: AppColors.primary,
-    
+
     canvasColor: AppColors.backgroundDark,
     scaffoldBackgroundColor: AppColors.backgroundDark,
     cardColor: AppColors.surfaceDark,
@@ -98,8 +106,7 @@ class AppTheme {
       onSecondary: Colors.white,
       surface: AppColors.surfaceDark,
       onSurface: AppColors.textDark,
-      background: AppColors.backgroundDark,
-      onBackground: AppColors.textDark,
+      // background and onBackground removed as they are deprecated and surface is already defined
       error: AppColors.error,
       onError: Colors.white,
       surfaceTint: Colors.transparent,
@@ -115,11 +122,15 @@ class AppTheme {
 
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(AppColors.primary),
-        foregroundColor: MaterialStateProperty.all(Colors.white),
-        elevation: MaterialStateProperty.all(0),
-        shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
-        padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 24, vertical: 14)),
+        backgroundColor: WidgetStateProperty.all(AppColors.primary),
+        foregroundColor: WidgetStateProperty.all(Colors.white),
+        elevation: WidgetStateProperty.all(0),
+        shape: WidgetStateProperty.all(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+        padding: WidgetStateProperty.all(
+          const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        ),
       ),
     ),
 
@@ -129,10 +140,17 @@ class AppTheme {
       backgroundColor: AppColors.surfaceDark,
       type: BottomNavigationBarType.fixed,
     ),
-    
+
     textTheme: const TextTheme(
-      titleLarge: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.bold, fontSize: 20),
-      titleMedium: TextStyle(color: AppColors.textDark, fontWeight: FontWeight.w600),
+      titleLarge: TextStyle(
+        color: AppColors.textDark,
+        fontWeight: FontWeight.bold,
+        fontSize: 20,
+      ),
+      titleMedium: TextStyle(
+        color: AppColors.textDark,
+        fontWeight: FontWeight.w600,
+      ),
       bodyLarge: TextStyle(color: AppColors.textDark),
       bodyMedium: TextStyle(color: AppColors.textDark),
       bodySmall: TextStyle(color: Colors.grey),

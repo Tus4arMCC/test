@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../services/address_api_service.dart';
 
 class AddressFormScreen extends StatefulWidget {
   const AddressFormScreen({super.key});
@@ -13,6 +14,24 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
   bool _isDefault = true;
   String? _selectedState;
   final List<String> _states = ['NY', 'CA', 'TX', 'FL'];
+
+  final _nameController = TextEditingController();
+  final _streetController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _zipController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _streetController.dispose();
+    _cityController.dispose();
+    _zipController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +60,6 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Progress Indicator
                   Row(
                     children: [
                       Expanded(child: Container(height: 4, decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(2)))),
@@ -52,21 +70,15 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                     ],
                   ),
                   const SizedBox(height: 32),
-                  
+
                   _buildLabel("Full Name"),
-                  _buildTextField(
-                    hint: "Jane Doe",
-                    icon: Icons.person_outline,
-                  ),
+                  _buildTextField(controller: _nameController, hint: "Jane Doe", icon: Icons.person_outline),
                   const SizedBox(height: 24),
-                  
+
                   _buildLabel("Street Address"),
-                  _buildTextField(
-                    hint: "123 Fashion Ave",
-                    icon: Icons.location_on_outlined,
-                  ),
+                  _buildTextField(controller: _streetController, hint: "123 Fashion Ave", icon: Icons.location_on_outlined),
                   const SizedBox(height: 24),
-                  
+
                   Row(
                     children: [
                       Expanded(
@@ -74,7 +86,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLabel("City"),
-                            _buildTextField(hint: "New York"),
+                            _buildTextField(controller: _cityController, hint: "New York"),
                           ],
                         ),
                       ),
@@ -91,7 +103,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  
+
                   Row(
                     children: [
                       Expanded(
@@ -99,7 +111,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLabel("Zip Code"),
-                            _buildTextField(hint: "10001", keyboardType: TextInputType.number),
+                            _buildTextField(controller: _zipController, hint: "10001", keyboardType: TextInputType.number),
                           ],
                         ),
                       ),
@@ -109,18 +121,21 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLabel("Phone"),
-                            _buildTextField(hint: "(555) 000-0000", keyboardType: TextInputType.phone),
+                            _buildTextField(controller: _phoneController, hint: "(555) 000-0000", keyboardType: TextInputType.phone),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  
+
+                  const SizedBox(height: 16),
+                  _buildLabel("Email Address"),
+                  _buildTextField(controller: _emailController, hint: "example@email.com", keyboardType: TextInputType.emailAddress),
+
                   const SizedBox(height: 32),
                   const Divider(),
                   const SizedBox(height: 16),
-                  
-                  // Default Toggle
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -142,8 +157,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
               ),
             ),
           ),
-          
-          // Save Button
+
           Positioned(
             bottom: 0,
             left: 0,
@@ -155,9 +169,27 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                 border: Border(top: BorderSide(color: colorScheme.outline.withOpacity(0.05))),
               ),
               child: ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    Navigator.pop(context);
+                onPressed: () async {
+                  if (!_formKey.currentState!.validate()) return;
+
+                  final payload = {
+                    'name': _nameController.text.trim(),
+                    'address': _streetController.text.trim(),
+                    'city': _cityController.text.trim(),
+                    'state': _selectedState ?? '',
+                    'pincode': _zipController.text.trim(),
+                    'phone': _phoneController.text.trim(),
+                    'email': _emailController.text.trim(),
+                    'isDefault': _isDefault,
+                  };
+
+                  try {
+                    await AddressApiService.createAddress(payload);
+                    Navigator.pop(context, true);
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to save address: $e')),
+                    );
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -190,10 +222,15 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
     );
   }
 
-  Widget _buildTextField({required String hint, IconData? icon, TextInputType? keyboardType}) {
+  Widget _buildTextField({TextEditingController? controller, required String hint, IconData? icon, TextInputType? keyboardType}) {
     final colorScheme = Theme.of(context).colorScheme;
     return TextFormField(
+      controller: controller,
       keyboardType: keyboardType,
+      validator: (v) {
+        if (v == null || v.trim().isEmpty) return 'Required';
+        return null;
+      },
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(color: Colors.grey[400], fontSize: 15),

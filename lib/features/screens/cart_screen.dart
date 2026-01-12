@@ -67,6 +67,40 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
+  void _showRemoveConfirmation(BuildContext context, CartProduct item) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Product?'),
+        content: Text('Do you want to remove "${item.name}" from your cart?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                final message = await _cartLogic.removeFromCart(
+                  item.variationId,
+                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(message)));
+              } catch (e) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(e.toString())));
+              }
+            },
+            child: const Text('Yes', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -323,7 +357,7 @@ class _CartScreenState extends State<CartScreen> {
                       color: Colors.grey,
                       iconSize: 20,
                       onPressed: () {
-                        _cartLogic.removeFromCart(item.variationId);
+                        _showRemoveConfirmation(context, item);
                       },
                     ),
                   ],
@@ -366,17 +400,35 @@ class _CartScreenState extends State<CartScreen> {
                       _buildQuantitySelector(
                         colorScheme,
                         item.quantity,
-                        onMinus: () {
-                          _cartLogic.updateQuantity(
-                            variationId: item.variationId,
-                            newQuantity: item.quantity - 1,
-                          );
+                        onMinus: () async {
+                          try {
+                            final message = await _cartLogic.updateQuantity(
+                              variationId: item.variationId,
+                              newQuantity: item.quantity - 1,
+                            );
+                            ScaffoldMessenger.of(
+                              context,
+                            ).showSnackBar(SnackBar(content: Text(message)));
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
                         },
-                        onPlus: () {
-                          _cartLogic.updateQuantity(
-                            variationId: item.variationId,
-                            newQuantity: item.quantity + 1,
-                          );
+                        onPlus: () async {
+                          try {
+                            final message = await _cartLogic.updateQuantity(
+                              variationId: item.variationId,
+                              newQuantity: item.quantity + 1,
+                            );
+                            ScaffoldMessenger.of(
+                              context,
+                            ).showSnackBar(SnackBar(content: Text(message)));
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
                         },
                       ),
                   ],
@@ -508,9 +560,68 @@ class _CartScreenState extends State<CartScreen> {
             ),
           ),
           const SizedBox(height: 16),
+          // Product List with Names and Prices
+          if (selectedItems.isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Products",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...selectedItems.map((item) {
+                  final itemTotal = item.price * item.quantity;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.name,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.black87,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                'Qty: ${item.quantity} × ₹${item.price.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          '₹${itemTotal.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                const Divider(height: 16),
+              ],
+            ),
           _buildSummaryRow(
-            "subtotal",
-            "₹${totalMRP.toStringAsFixed(2)}", // Web uses Total MRP here
+            "Subtotal",
+            "₹${totalAmount.toStringAsFixed(2)}", // Web uses Total MRP here
             colorScheme,
           ),
           const SizedBox(height: 12),
