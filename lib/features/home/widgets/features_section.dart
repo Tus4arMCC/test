@@ -9,28 +9,33 @@ class FeaturesSection extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-      color: theme.colorScheme.primary, // Using primary color as background
-      child: Column(
+      color: theme.colorScheme.primary,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildFeatureItem(
-            icon: Icons.local_shipping_outlined,
-            title: "Free Shipping",
-            subtitle: "For orders above ₹500* (TnC Apply)",
-            theme: theme,
+          Expanded(
+            child: _buildFeatureItem(
+              icon: Icons.local_shipping_outlined,
+              title: "Free Shipping",
+              subtitle: "For orders above ₹500* (TnC Apply)",
+              theme: theme,
+            ),
           ),
-          const SizedBox(height: 24),
-          _buildFeatureItem(
-            icon: Icons.verified_user_outlined,
-            title: "Highest Safety Standards",
-            subtitle: "Enjoy worry-free shopping",
-            theme: theme,
+          Expanded(
+            child: _buildFeatureItem(
+              icon: Icons.verified_user_outlined,
+              title: "Highest Safety Standards",
+              subtitle: "Enjoy worry-free shopping",
+              theme: theme,
+            ),
           ),
-          const SizedBox(height: 24),
-          _buildFeatureItem(
-            icon: Icons.lock_outline,
-            title: "Secured Payments",
-            subtitle: "Fast and Secure Checkout",
-            theme: theme,
+          Expanded(
+            child: _buildFeatureItem(
+              icon: Icons.lock_outline,
+              title: "Secured Payments",
+              subtitle: "Fast and Secure Checkout",
+              theme: theme,
+            ),
           ),
         ],
       ),

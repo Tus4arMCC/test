@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:flutter/services.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../core/utils/image_utils.dart';
 import '../../../core/widgets/wishlist_button.dart';
 import '../../home/models/product_data_model.dart';
 import '../../home/models/variation_model.dart';
-import '../repository/product_repository.dart';
+
 import '../../home/services/product_detail_api_service.dart';
 
 import '../../home/services/cart_logic_service.dart';
@@ -46,8 +45,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   SellerPrice? _selectedSeller;
 
   // Constants
-  static const int MAX_ORDER_QTY =
-      10; // Could probably pull from .env if needed
+  static const int maxOrderQty = 10; // Could probably pull from .env if needed
 
   @override
   void initState() {
@@ -118,9 +116,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   void _handleQuantityChange(String type) {
     if (type == "increment") {
-      if (_quantity >= MAX_ORDER_QTY) {
+      if (_quantity >= maxOrderQty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Maximum order quantity is $MAX_ORDER_QTY")),
+          SnackBar(content: Text("Maximum order quantity is $maxOrderQty")),
         );
         return;
       }
@@ -155,8 +153,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
       // 2. Check if this variation matches all other currently selected attributes
       return _selectedAttributes.entries.every((entry) {
-        if (entry.key == attrName)
+        if (entry.key == attrName) {
           return true; // Ignore the attribute group we are validating
+        }
         return v.variationAttributes.any(
           (va) => va.attributeName == entry.key && va.value == entry.value,
         );
@@ -186,16 +185,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         );
 
     // Strategy 2: Partial Match (if exact not found, find first valid one for this new selection)
-    if (matchingVariation == null) {
-      matchingVariation = _productData!.variations
-          .cast<Variation?>()
-          .firstWhere(
-            (v) => v!.variationAttributes.any(
-              (attr) => attr.attributeName == name && attr.value == value,
-            ),
-            orElse: () => null,
-          );
-    }
+    matchingVariation ??= _productData!.variations
+        .cast<Variation?>()
+        .firstWhere(
+          (v) => v!.variationAttributes.any(
+            (attr) => attr.attributeName == name && attr.value == value,
+          ),
+          orElse: () => null,
+        );
 
     if (matchingVariation != null) {
       _loadProduct(matchingVariation.variationCode);
@@ -256,12 +253,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           _isCartActionRunning = false;
         });
 
-        // Refresh global count
-        await CountStateManager().refresh();
+        if (mounted) {
+          // Refresh global count
+          await CountStateManager().refresh();
 
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(message)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(message)));
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -310,16 +309,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         // This prevents empty screen and ensures fresh state
         await _loadProduct();
 
-        setState(() {
-          _isCartActionRunning = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isCartActionRunning = false;
+          });
 
-        // Refresh global count
-        await CountStateManager().refresh();
+          // Refresh global count
+          await CountStateManager().refresh();
 
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(message)));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(message)));
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -329,44 +330,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
-  }
-
-  /// Build badge icon with count
-  Widget _buildBadgeIcon({
-    required IconData icon,
-    required int count,
-    required VoidCallback onPressed,
-  }) {
-    return Stack(
-      children: [
-        IconButton(
-          icon: Icon(icon, color: Colors.black),
-          onPressed: onPressed,
-        ),
-        if (count > 0)
-          Positioned(
-            right: 6,
-            top: 6,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: Color(0xFFDC3545),
-                shape: BoxShape.circle,
-              ),
-              constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
-              child: Text(
-                count > 99 ? '99+' : count.toString(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-      ],
-    );
   }
 
   void _showShareModal() {
@@ -412,7 +375,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                     ),
                   ],
@@ -498,25 +461,105 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             icon: const Icon(Icons.qr_code, color: Colors.black),
             onPressed: _showShareModal,
           ),
-          _buildBadgeIcon(
-            icon: Icons.favorite_outline,
-            count: _countManager.wishlistCount,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const WishlistScreen()),
-              );
-            },
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.favorite_border),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const WishlistScreen(),
+                    ),
+                  );
+                },
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: AnimatedBuilder(
+                  animation: _countManager,
+                  builder: (context, child) {
+                    final count = _countManager.wishlistCount;
+                    if (count == 0) return const SizedBox.shrink();
+
+                    return Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.surface,
+                          width: 2,
+                        ),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 20,
+                        minHeight: 20,
+                      ),
+                      child: Text(
+                        "$count",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
-          _buildBadgeIcon(
-            icon: Icons.shopping_cart_outlined,
-            count: _countManager.cartCount,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const CartScreen()),
-              );
-            },
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.shopping_bag_outlined),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const CartScreen()),
+                  );
+                },
+              ),
+              Positioned(
+                right: 8,
+                top: 8,
+                child: AnimatedBuilder(
+                  animation: _countManager,
+                  builder: (context, child) {
+                    final count = _countManager.cartCount;
+                    if (count == 0) return const SizedBox.shrink();
+
+                    return Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.surface,
+                          width: 2,
+                        ),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 20,
+                        minHeight: 20,
+                      ),
+                      child: Text(
+                        "$count",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -547,7 +590,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: images.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 12),
                         itemBuilder: (context, index) {
                           final isSelected = _selectedImageIndex == index;
                           return GestureDetector(
@@ -657,24 +701,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       const Spacer(),
 
                       // Wishlist Button (disabled if in cart)
-                      Opacity(
-                        opacity: _localIsInCart ? 0.5 : 1.0,
-                        child: IgnorePointer(
-                          ignoring: _localIsInCart,
-                          child: WishlistButton(
-                            variationId: product.variationCode,
-                            isInWishlist: _localLiked,
-                            iconSize: 24,
-                            showBackground: true,
-                            backgroundColor: Colors.grey[100],
-                            onWishlistChanged: (isInWishlist) {
-                              setState(() {
-                                _localLiked = isInWishlist;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
+                      // Opacity(
+                      //   opacity: _localIsInCart ? 0.5 : 1.0,
+                      //   child: IgnorePointer(
+                      //     ignoring: _localIsInCart,
+                      //     child: WishlistButton(
+                      //       variationId: product.variationCode,
+                      //       isInWishlist: _localLiked,
+                      //       iconSize: 24,
+                      //       showBackground: true,
+                      //       activeColor: theme.colorScheme.primary,
+                      //       backgroundColor: Colors.grey[100],
+                      //       onWishlistChanged: (isInWishlist) {
+                      //         setState(() {
+                      //           _localLiked = isInWishlist;
+                      //         });
+                      //       },
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ],
@@ -698,49 +743,51 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    SizedBox(
-                      height: 160, // Height for SellerCard
-                      child: ListView.separated(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: product.sellers.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
-                        itemBuilder: (context, index) {
-                          // Sort so selected is first? Or just list them?
-                          // React code: getSortedSellers() puts selected first.
-                          // Let's replicate that sorting.
-                          List<SellerPrice> sortedSellers = List.from(
-                            product.sellers,
-                          );
-                          sortedSellers.sort(
-                            (a, b) => a.price.compareTo(b.price),
-                          );
+                    Builder(
+                      builder: (context) {
+                        List<SellerPrice> sortedSellers = List.from(
+                          product.sellers,
+                        );
+                        sortedSellers.sort(
+                          (a, b) => a.price.compareTo(b.price),
+                        );
 
-                          if (_selectedSeller != null) {
-                            final selectedIndex = sortedSellers.indexWhere(
-                              (s) =>
-                                  s.mappingCode == _selectedSeller!.mappingCode,
+                        if (_selectedSeller != null) {
+                          final selectedIndex = sortedSellers.indexWhere(
+                            (s) =>
+                                s.mappingCode == _selectedSeller!.mappingCode,
+                          );
+                          if (selectedIndex > 0) {
+                            final selected = sortedSellers.removeAt(
+                              selectedIndex,
                             );
-                            if (selectedIndex > 0) {
-                              final selected = sortedSellers.removeAt(
-                                selectedIndex,
-                              );
-                              sortedSellers.insert(0, selected);
-                            }
+                            sortedSellers.insert(0, selected);
                           }
+                        }
 
-                          final seller = sortedSellers[index];
-                          return SellerCard(
-                            seller: seller,
-                            variationName: product.variationName,
-                            isSelected:
-                                _selectedSeller?.mappingCode ==
-                                seller.mappingCode,
-                            onSelect: _handleSellerSelect,
-                            productImage: primaryImage,
-                          );
-                        },
-                      ),
+                        return SizedBox(
+                          height: 160, // Height for SellerCard
+                          child: ListView.separated(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            scrollDirection: Axis.horizontal,
+                            itemCount: sortedSellers.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(width: 12),
+                            itemBuilder: (context, index) {
+                              final seller = sortedSellers[index];
+                              return SellerCard(
+                                seller: seller,
+                                variationName: product.variationName,
+                                isSelected:
+                                    _selectedSeller?.mappingCode ==
+                                    seller.mappingCode,
+                                onSelect: _handleSellerSelect,
+                                productImage: primaryImage,
+                              );
+                            },
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -769,7 +816,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         scrollDirection: Axis.horizontal,
                         itemCount: otherVariations.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 12),
                         itemBuilder: (context, index) {
                           final v = otherVariations[index];
                           final img = v.images.isNotEmpty
@@ -885,7 +933,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
+                            color: Colors.green.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -1132,7 +1180,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -5),
             ),
@@ -1141,6 +1189,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         child: SafeArea(
           child: Row(
             children: [
+              WishlistButton(
+                variationId: product.variationCode,
+                isInWishlist: _localLiked,
+                iconSize: 24,
+                activeColor: theme.colorScheme.primary,
+                backgroundColor: Colors.grey[100],
+              ),
+              const SizedBox(width: 16),
               // Add to Cart
               Expanded(
                 child: OutlinedButton(

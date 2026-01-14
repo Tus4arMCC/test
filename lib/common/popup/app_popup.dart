@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 enum PopupType { success, error }
 
 class AppPopup {
-  static void show(
+  static Future<void> show(
     BuildContext context, {
     required String title,
     required String message,
@@ -11,13 +11,11 @@ class AppPopup {
   }) {
     final isSuccess = type == PopupType.success;
 
-    showDialog(
+    return showDialog(
       context: context,
       barrierDismissible: true,
       builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -33,16 +31,12 @@ class AppPopup {
               const SizedBox(height: 16),
               Text(
                 title,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              Text(
-                message,
-                textAlign: TextAlign.center,
-              ),
+              Text(message, textAlign: TextAlign.center),
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,

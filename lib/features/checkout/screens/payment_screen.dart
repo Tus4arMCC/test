@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../home/models/cart_wishlist_models.dart';
 import '../../home/services/cart_api_service.dart';
@@ -25,21 +24,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
   bool _isLoading = false;
 
   // Form controllers
-  final _cardNumberController = TextEditingController();
-  final _cardNameController = TextEditingController();
-  final _cardExpiryController = TextEditingController();
-  final _cardCvvController = TextEditingController();
-  final _upiIdController = TextEditingController();
-  String? _selectedBank;
-  String? _selectedWallet;
-
   @override
   void dispose() {
-    _cardNumberController.dispose();
-    _cardNameController.dispose();
-    _cardExpiryController.dispose();
-    _cardCvvController.dispose();
-    _upiIdController.dispose();
     super.dispose();
   }
 
@@ -113,11 +99,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (token.isNotEmpty) Text("Your Order Token: $token"),
-                const SizedBox(height: 8),
-                Text(
-                  "Payment Method: ${_getPaymentMethodName(_selectedMethod)}",
-                ),
+                Text("Order No: $orderNo"),
                 const SizedBox(height: 16),
                 const Text("Thank you for shopping with us!"),
               ],
@@ -152,27 +134,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  String _getPaymentMethodName(String method) {
-    switch (method) {
-      case 'cod':
-        return 'Cash on Delivery';
-      case 'online':
-        return 'Online Payment';
-      case 'card':
-        return 'Credit/Debit Card';
-      case 'upi':
-        return 'UPI';
-      case 'netbanking':
-        return 'Net Banking';
-      case 'wallet':
-        return 'Wallet';
-      case 'emi':
-        return 'EMI';
-      default:
-        return method;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -200,7 +161,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -245,7 +206,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -309,7 +270,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, -4),
             ),
@@ -352,7 +313,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: isSelected
-                ? colorScheme.primary.withOpacity(0.05)
+                ? colorScheme.primary.withValues(alpha: 0.05)
                 : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
@@ -386,167 +347,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCardForm() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Column(
-        children: [
-          TextField(
-            controller: _cardNumberController,
-            decoration: const InputDecoration(
-              hintText: "Card Number",
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 12,
-              ),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _cardNameController,
-            decoration: const InputDecoration(
-              hintText: "Name on Card",
-              border: OutlineInputBorder(),
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 12,
-              ),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _cardExpiryController,
-                  decoration: const InputDecoration(
-                    hintText: "MM/YY",
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextField(
-                  controller: _cardCvvController,
-                  decoration: const InputDecoration(
-                    hintText: "CVV",
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                  obscureText: true,
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUpiForm() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: TextField(
-        controller: _upiIdController,
-        decoration: const InputDecoration(
-          hintText: "example@upi",
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          filled: true,
-          fillColor: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNetBankingForm() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: DropdownButtonFormField<String>(
-        value: _selectedBank,
-        items: [
-          'HDFC',
-          'ICICI',
-          'SBI',
-          'Axis Bank',
-        ].map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
-        onChanged: (val) => setState(() => _selectedBank = val),
-        decoration: const InputDecoration(
-          hintText: "Select Bank",
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          filled: true,
-          fillColor: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWalletForm() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: DropdownButtonFormField<String>(
-        value: _selectedWallet,
-        items: [
-          'Paytm',
-          'PhonePe',
-          'Mobikwik',
-        ].map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
-        onChanged: (val) => setState(() => _selectedWallet = val),
-        decoration: const InputDecoration(
-          hintText: "Select Wallet",
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          filled: true,
-          fillColor: Colors.white,
         ),
       ),
     );

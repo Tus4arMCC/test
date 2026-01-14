@@ -39,7 +39,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
@@ -47,7 +47,9 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
         ),
         title: Text(
           "Add New Address",
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
       ),
@@ -62,21 +64,53 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                 children: [
                   Row(
                     children: [
-                      Expanded(child: Container(height: 4, decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(2)))),
+                      Expanded(
+                        child: Container(
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 8),
-                      Expanded(child: Container(height: 4, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(2)))),
+                      Expanded(
+                        child: Container(
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 8),
-                      Expanded(child: Container(height: 4, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(2)))),
+                      Expanded(
+                        child: Container(
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 32),
 
                   _buildLabel("Full Name"),
-                  _buildTextField(controller: _nameController, hint: "Jane Doe", icon: Icons.person_outline),
+                  _buildTextField(
+                    controller: _nameController,
+                    hint: "Jane Doe",
+                    icon: Icons.person_outline,
+                  ),
                   const SizedBox(height: 24),
 
                   _buildLabel("Street Address"),
-                  _buildTextField(controller: _streetController, hint: "123 Fashion Ave", icon: Icons.location_on_outlined),
+                  _buildTextField(
+                    controller: _streetController,
+                    hint: "123 Fashion Ave",
+                    icon: Icons.location_on_outlined,
+                  ),
                   const SizedBox(height: 24),
 
                   Row(
@@ -86,7 +120,10 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLabel("City"),
-                            _buildTextField(controller: _cityController, hint: "New York"),
+                            _buildTextField(
+                              controller: _cityController,
+                              hint: "New York",
+                            ),
                           ],
                         ),
                       ),
@@ -111,7 +148,11 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLabel("Zip Code"),
-                            _buildTextField(controller: _zipController, hint: "10001", keyboardType: TextInputType.number),
+                            _buildTextField(
+                              controller: _zipController,
+                              hint: "10001",
+                              keyboardType: TextInputType.number,
+                            ),
                           ],
                         ),
                       ),
@@ -121,7 +162,11 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildLabel("Phone"),
-                            _buildTextField(controller: _phoneController, hint: "(555) 000-0000", keyboardType: TextInputType.phone),
+                            _buildTextField(
+                              controller: _phoneController,
+                              hint: "(555) 000-0000",
+                              keyboardType: TextInputType.phone,
+                            ),
                           ],
                         ),
                       ),
@@ -130,7 +175,11 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
 
                   const SizedBox(height: 16),
                   _buildLabel("Email Address"),
-                  _buildTextField(controller: _emailController, hint: "example@email.com", keyboardType: TextInputType.emailAddress),
+                  _buildTextField(
+                    controller: _emailController,
+                    hint: "example@email.com",
+                    keyboardType: TextInputType.emailAddress,
+                  ),
 
                   const SizedBox(height: 32),
                   const Divider(),
@@ -142,8 +191,17 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                       const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Set as default address", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          Text("Use this address for checkout", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                          Text(
+                            "Set as default address",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            "Use this address for checkout",
+                            style: TextStyle(color: Colors.grey, fontSize: 12),
+                          ),
                         ],
                       ),
                       Switch(
@@ -165,8 +223,12 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
             child: Container(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
               decoration: BoxDecoration(
-                color: colorScheme.background.withOpacity(0.9),
-                border: Border(top: BorderSide(color: colorScheme.outline.withOpacity(0.05))),
+                color: colorScheme.surface.withValues(alpha: 0.9),
+                border: Border(
+                  top: BorderSide(
+                    color: colorScheme.outline.withValues(alpha: 0.05),
+                  ),
+                ),
               ),
               child: ElevatedButton(
                 onPressed: () async {
@@ -185,21 +247,33 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
 
                   try {
                     await AddressApiService.createAddress(payload);
-                    Navigator.pop(context, true);
+                    if (context.mounted) {
+                      Navigator.pop(context, true);
+                    }
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to save address: $e')),
-                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to save address: $e')),
+                      );
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Save Address", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(
+                      "Save Address",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     SizedBox(width: 8),
                     Icon(Icons.check, size: 20),
                   ],
@@ -217,12 +291,21 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
       padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(
         text,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.grey),
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+          color: Colors.grey,
+        ),
       ),
     );
   }
 
-  Widget _buildTextField({TextEditingController? controller, required String hint, IconData? icon, TextInputType? keyboardType}) {
+  Widget _buildTextField({
+    TextEditingController? controller,
+    required String hint,
+    IconData? icon,
+    TextInputType? keyboardType,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     return TextFormField(
       controller: controller,
@@ -234,7 +317,9 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(color: Colors.grey[400], fontSize: 15),
-        suffixIcon: icon != null ? Icon(icon, color: Colors.grey[300], size: 20) : null,
+        suffixIcon: icon != null
+            ? Icon(icon, color: Colors.grey[300], size: 20)
+            : null,
         filled: true,
         fillColor: colorScheme.surface,
         border: OutlineInputBorder(
@@ -249,7 +334,10 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
       ),
     );
   }
@@ -265,14 +353,14 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           isExpanded: true,
-          hint: Text("Select", style: TextStyle(color: Colors.grey[400], fontSize: 15)),
+          hint: Text(
+            "Select",
+            style: TextStyle(color: Colors.grey[400], fontSize: 15),
+          ),
           value: _selectedState,
           icon: const Icon(Icons.expand_more, color: Colors.grey),
           items: _states.map((state) {
-            return DropdownMenuItem(
-              value: state,
-              child: Text(state),
-            );
+            return DropdownMenuItem(value: state, child: Text(state));
           }).toList(),
           onChanged: (val) => setState(() => _selectedState = val),
         ),

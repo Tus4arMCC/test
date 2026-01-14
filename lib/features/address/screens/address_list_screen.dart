@@ -34,13 +34,16 @@ class _AddressListScreenState extends State<AddressListScreen> {
   }
 
   Future<void> _loadAddresses() async {
+    if (!mounted) return;
     setState(() => _loading = true);
     try {
       _addresses = await AddressApiService.fetchAddresses();
     } catch (e) {
       _addresses = [];
     } finally {
-      setState(() => _loading = false);
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
@@ -50,7 +53,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
@@ -104,17 +107,14 @@ class _AddressListScreenState extends State<AddressListScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    colorScheme.background.withOpacity(0),
-                    colorScheme.background,
+                    colorScheme.surface.withValues(alpha: 0),
+                    colorScheme.surface,
                   ],
                 ),
               ),
               child: ElevatedButton(
                 onPressed: () async {
-                  final result = await Navigator.pushNamed(
-                    context,
-                    '/address-form',
-                  );
+                  await Navigator.pushNamed(context, '/address-form');
                   // refresh list after returning from add
                   await _loadAddresses();
                 },
@@ -125,7 +125,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                   ),
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  shadowColor: AppColors.primary.withOpacity(0.4),
+                  shadowColor: AppColors.primary.withValues(alpha: 0.4),
                   elevation: 8,
                 ),
                 child: const Row(
@@ -194,8 +194,8 @@ class _AddressListScreenState extends State<AddressListScreen> {
           boxShadow: [
             BoxShadow(
               color: isSelected
-                  ? AppColors.primary.withOpacity(0.05)
-                  : Colors.black.withOpacity(0.02),
+                  ? AppColors.primary.withValues(alpha: 0.05)
+                  : Colors.black.withValues(alpha: 0.02),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -218,7 +218,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                         blurRadius: 4,
                       ),
                     ],
@@ -244,7 +244,7 @@ class _AddressListScreenState extends State<AddressListScreen> {
                       height: 48,
                       decoration: BoxDecoration(
                         color: (isSelected ? AppColors.primary : Colors.grey)
-                            .withOpacity(0.1),
+                            .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(

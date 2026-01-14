@@ -19,4 +19,5 @@ class AppColors {
   // Status
   static const Color error = Colors.red;
   static const Color success = Colors.green;
+  
 }

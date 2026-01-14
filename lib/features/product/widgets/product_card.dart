@@ -25,6 +25,16 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   @override
+  void didUpdateWidget(covariant ProductCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Ensure local favourite state stays in sync when the product changes
+    if (oldWidget.product.code != widget.product.code ||
+        oldWidget.product.isFavourite != widget.product.isFavourite) {
+      isFav = widget.product.isFavourite;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
@@ -80,6 +90,7 @@ class _ProductCardState extends State<ProductCard> {
 
                       iconSize: 18,
                       showBackground: true,
+                      activeColor: theme.colorScheme.primary,
                       backgroundColor: theme.colorScheme.surface,
                       onWishlistChanged: (isInWishlist) {
                         setState(() {

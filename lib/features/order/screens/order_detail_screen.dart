@@ -12,7 +12,7 @@ class OrderDetailScreen extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
@@ -23,7 +23,9 @@ class OrderDetailScreen extends StatelessWidget {
           children: [
             Text(
               "Order #ORD-3920",
-              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const Text(
               "Oct 24, 2023 • 2 Items",
@@ -32,10 +34,7 @@ class OrderDetailScreen extends StatelessWidget {
           ],
         ),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.more_horiz),
-          ),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.more_horiz)),
         ],
       ),
       body: Stack(
@@ -55,7 +54,7 @@ class OrderDetailScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.02),
+                          color: Colors.black.withValues(alpha: 0.02),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -70,10 +69,13 @@ class OrderDetailScreen extends StatelessWidget {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.1),
+                                color: AppColors.primary.withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.local_shipping, color: AppColors.primary),
+                              child: const Icon(
+                                Icons.local_shipping,
+                                color: AppColors.primary,
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Column(
@@ -81,11 +83,18 @@ class OrderDetailScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   "In Transit",
-                                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900, fontSize: 20),
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 20,
+                                  ),
                                 ),
                                 const Text(
                                   "Arriving Tomorrow, 2:00 PM",
-                                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 13),
+                                  style: TextStyle(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ],
                             ),
@@ -137,14 +146,16 @@ class OrderDetailScreen extends StatelessWidget {
                   title: "Oversized Trench",
                   price: "120.00",
                   subtitle: "Size: M • Beige",
-                  imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAlDw--mzkKV9_GAAWaP6KyG9vm8i0MaTlTiwBfTwxTwGiUqQ4M9kHWsY7GbpEHZXCqCQpsh1R_ST8Ozhgr9tl-YDey1Ei1Bp-9GHtH_pdKVtrpkx69dEKA7c8KxxDwNBhAgj2ZVcGj4H4n4cae3FPkQmxjneXWtXZF8MimFbER1Q-mb8t8ZfodEaHVIlYz29itKmF_ARV5ZhRrvGadqG9ujNtH4r6bAzElpRAIFjWjLwin6XPMGK6yvKJVfXT4MID5GwQbzqfIS-55",
+                  imageUrl:
+                      "https://lh3.googleusercontent.com/aida-public/AB6AXuAlDw--mzkKV9_GAAWaP6KyG9vm8i0MaTlTiwBfTwxTwGiUqQ4M9kHWsY7GbpEHZXCqCQpsh1R_ST8Ozhgr9tl-YDey1Ei1Bp-9GHtH_pdKVtrpkx69dEKA7c8KxxDwNBhAgj2ZVcGj4H4n4cae3FPkQmxjneXWtXZF8MimFbER1Q-mb8t8ZfodEaHVIlYz29itKmF_ARV5ZhRrvGadqG9ujNtH4r6bAzElpRAIFjWjLwin6XPMGK6yvKJVfXT4MID5GwQbzqfIS-55",
                 ),
                 _buildOrderItem(
                   context,
                   title: "Velvet Pumps",
                   price: "85.00",
                   subtitle: "Size: 38 • Blue",
-                  imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuDF3UU9OgkSdZyTBzzoDoWqrQPhz7syO4-_0GMBK6jK29O0RV7HfkBnPEvc2lgYbq-mrwFPTvm6e9ChjM6dgJsO-z787SreucjG5gxMmW2hSi2XJuKZEWYPVinI4xKRmr38ZQdaHZrYzexP1FgVBzMYfjO5rt7LzuFxdQTjhuh7jIyl4AmiijNQiLR8g5nzxrzu2sQxOz2DXP55kl2_kgIySAvbv8Yc2pVSWRQ-Cvr_jGE3m936kmLO9fNGtTaPvSl7ADpkiflawVts",
+                  imageUrl:
+                      "https://lh3.googleusercontent.com/aida-public/AB6AXuDF3UU9OgkSdZyTBzzoDoWqrQPhz7syO4-_0GMBK6jK29O0RV7HfkBnPEvc2lgYbq-mrwFPTvm6e9ChjM6dgJsO-z787SreucjG5gxMmW2hSi2XJuKZEWYPVinI4xKRmr38ZQdaHZrYzexP1FgVBzMYfjO5rt7LzuFxdQTjhuh7jIyl4AmiijNQiLR8g5nzxrzu2sQxOz2DXP55kl2_kgIySAvbv8Yc2pVSWRQ-Cvr_jGE3m936kmLO9fNGtTaPvSl7ADpkiflawVts",
                 ),
 
                 const SizedBox(height: 16),
@@ -162,8 +173,20 @@ class OrderDetailScreen extends StatelessWidget {
                           detailBody: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text("Jane Doe", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                              Text("123 Fashion Ave,\nNew York, NY 10001", style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                              const Text(
+                                "Jane Doe",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              Text(
+                                "123 Fashion Ave,\nNew York, NY 10001",
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -177,8 +200,20 @@ class OrderDetailScreen extends StatelessWidget {
                           detailBody: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text("Visa ending 4242", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                              Text("Exp 12/25", style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+                              const Text(
+                                "Visa ending 4242",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              Text(
+                                "Exp 12/25",
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -201,21 +236,44 @@ class OrderDetailScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Order Summary", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                        const Text(
+                          "Order Summary",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
                         const SizedBox(height: 16),
                         _buildSummaryRow("Subtotal", "₹205.00"),
                         const SizedBox(height: 12),
                         _buildSummaryRow("Shipping", "₹0.00"),
                         const SizedBox(height: 12),
-                        _buildSummaryRow("Discount (FALL20)", "-₹20.00", isDiscount: true),
+                        _buildSummaryRow(
+                          "Discount (FALL20)",
+                          "-₹20.00",
+                          isDiscount: true,
+                        ),
                         const SizedBox(height: 12),
                         const Divider(),
                         const SizedBox(height: 12),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Total", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                            const Text("₹185.00", style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.primary, fontSize: 20)),
+                            const Text(
+                              "Total",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const Text(
+                              "₹185.00",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.primary,
+                                fontSize: 20,
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -228,26 +286,44 @@ class OrderDetailScreen extends StatelessWidget {
                 // Recommendation Skeleton
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Text("You Might Also Like", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    "You Might Also Like",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
-                    children: List.generate(3, (index) => const Padding(
-                      padding: EdgeInsets.only(right: 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ScheduledSkeleton(height: 160, width: 120, borderRadius: 12),
-                          SizedBox(height: 12),
-                          ScheduledSkeleton(height: 14, width: 90, borderRadius: 4),
-                          SizedBox(height: 8),
-                          ScheduledSkeleton(height: 12, width: 60, borderRadius: 4),
-                        ],
+                    children: List.generate(
+                      3,
+                      (index) => const Padding(
+                        padding: EdgeInsets.only(right: 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ScheduledSkeleton(
+                              height: 160,
+                              width: 120,
+                              borderRadius: 12,
+                            ),
+                            SizedBox(height: 12),
+                            ScheduledSkeleton(
+                              height: 14,
+                              width: 90,
+                              borderRadius: 4,
+                            ),
+                            SizedBox(height: 8),
+                            ScheduledSkeleton(
+                              height: 12,
+                              width: 60,
+                              borderRadius: 4,
+                            ),
+                          ],
+                        ),
                       ),
-                    )),
+                    ),
                   ),
                 ),
               ],
@@ -261,8 +337,12 @@ class OrderDetailScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
               decoration: BoxDecoration(
-                color: colorScheme.background.withOpacity(0.9),
-                border: Border(top: BorderSide(color: colorScheme.outline.withOpacity(0.05))),
+                color: colorScheme.surface.withValues(alpha: 0.9),
+                border: Border(
+                  top: BorderSide(
+                    color: colorScheme.outline.withValues(alpha: 0.05),
+                  ),
+                ),
               ),
               child: Row(
                 children: [
@@ -272,9 +352,14 @@ class OrderDetailScreen extends StatelessWidget {
                       onPressed: () {},
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      child: const Text("Return", style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: const Text(
+                        "Return",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -284,7 +369,9 @@ class OrderDetailScreen extends StatelessWidget {
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -322,7 +409,11 @@ class OrderDetailScreen extends StatelessWidget {
             child: Column(
               children: [
                 if (isCompleted)
-                  const Icon(Icons.check_circle, color: AppColors.primary, size: 22)
+                  const Icon(
+                    Icons.check_circle,
+                    color: AppColors.primary,
+                    size: 22,
+                  )
                 else if (isCurrent)
                   Container(
                     width: 14,
@@ -330,20 +421,30 @@ class OrderDetailScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       shape: BoxShape.circle,
-                      boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 8)],
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.3),
+                          blurRadius: 8,
+                        ),
+                      ],
                     ),
                   )
                 else
                   Container(
                     width: 12,
                     height: 12,
-                    decoration: BoxDecoration(color: Colors.grey[300], shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 if (!isLast)
                   Expanded(
                     child: Container(
                       width: 2,
-                      color: isCompleted ? AppColors.primary.withOpacity(0.3) : Colors.grey[200],
+                      color: isCompleted
+                          ? AppColors.primary.withValues(alpha: 0.3)
+                          : Colors.grey[200],
                     ),
                   ),
               ],
@@ -362,7 +463,10 @@ class OrderDetailScreen extends StatelessWidget {
                     color: isCurrent ? AppColors.primary : null,
                   ),
                 ),
-                Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                Text(
+                  subtitle,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
               ],
             ),
           ),
@@ -386,11 +490,18 @@ class OrderDetailScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colorScheme.outline.withOpacity(0.05)),
+          border: Border.all(
+            color: colorScheme.outline.withValues(alpha: 0.05),
+          ),
         ),
         child: Row(
           children: [
-            AppImage(imageUrl: imageUrl, width: 70, height: 90, borderRadius: 10),
+            AppImage(
+              imageUrl: imageUrl,
+              width: 70,
+              height: 90,
+              borderRadius: 10,
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -399,16 +510,32 @@ class OrderDetailScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text("₹$price", style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        "₹$price",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
                   const SizedBox(height: 12),
                   const Text(
                     "Write a Review",
-                    style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -419,7 +546,12 @@ class OrderDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailCard(BuildContext context, {required IconData icon, required String title, required Widget detailBody}) {
+  Widget _buildDetailCard(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required Widget detailBody,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(16),
@@ -436,7 +568,12 @@ class OrderDetailScreen extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 title.toUpperCase(),
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.0, color: Colors.grey),
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.0,
+                  color: Colors.grey,
+                ),
               ),
             ],
           ),
@@ -447,7 +584,11 @@ class OrderDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, {bool isDiscount = false}) {
+  Widget _buildSummaryRow(
+    String label,
+    String value, {
+    bool isDiscount = false,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

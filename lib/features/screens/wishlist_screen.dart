@@ -7,6 +7,7 @@ import '../../core/utils/cookie_utils.dart';
 // import 'widgets/like_button.dart'; // Removed
 
 import '../../core/state/wishlist_state_manager.dart';
+import '../../core/state/count_state_manager.dart';
 
 class WishlistScreen extends StatefulWidget {
   final bool showBackButton;
@@ -142,15 +143,16 @@ class _WishlistScreenState extends State<WishlistScreen> {
   }
 
   Widget _buildLoadingState(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.favorite, size: 48, color: Colors.red),
+          Icon(Icons.favorite, size: 48, color: theme.colorScheme.primary),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Loading your wishlist...',
-            style: TextStyle(color: Colors.red),
+            style: TextStyle(color: theme.colorScheme.primary),
           ),
         ],
       ),
@@ -158,18 +160,24 @@ class _WishlistScreenState extends State<WishlistScreen> {
   }
 
   Widget _buildEmptyWishlist(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
+          Text(
             'Your wishlist is empty',
-            style: TextStyle(color: Color(0xFF94969F), fontSize: 20),
+            style: TextStyle(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              fontSize: 20,
+            ),
           ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'Add items you love to your wishlist 💖',
-            style: TextStyle(color: Color(0xFF94969F)),
+            style: TextStyle(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
           ),
           const SizedBox(height: 32),
           ElevatedButton(
@@ -179,14 +187,19 @@ class _WishlistScreenState extends State<WishlistScreen> {
               (route) => false,
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
-            child: const Text('Shop Now'),
+            child: Text(
+              'Shop Now',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onPrimary,
+              ),
+            ),
           ),
         ],
       ),
@@ -211,6 +224,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
   }
 
   Widget _buildWishlistCard(BuildContext context, WishlistItem item) {
+    final theme = Theme.of(context);
     final discount = (item.oldPrice != null && item.oldPrice! > item.price)
         ? ((item.oldPrice! - item.price) / item.oldPrice! * 100).round()
         : 0;
@@ -227,9 +241,11 @@ class _WishlistScreenState extends State<WishlistScreen> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.withOpacity(0.2)),
+          border: Border.all(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -257,15 +273,17 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   top: 8,
                   right: 8,
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white,
+                      color: theme.colorScheme.surface,
                     ),
                     child: IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.close,
                         size: 20,
-                        color: Colors.grey,
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                       onPressed: () {
                         // Logic to remove is handled by finding the WishlistButton in context usually,
@@ -366,12 +384,22 @@ class _WishlistScreenState extends State<WishlistScreen> {
                             }
                           : null,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFFDC3545),
-                        side: const BorderSide(color: Color(0xFFDC3545)),
+                        foregroundColor: item.isInCart
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onPrimary,
+                        backgroundColor: item.isInCart
+                            ? Colors.transparent
+                            : theme.colorScheme.primary,
+                        side: BorderSide(color: theme.colorScheme.primary),
                         padding: const EdgeInsets.symmetric(vertical: 8),
                       ),
                       child: Text(
                         item.isInCart ? 'REMOVE FROM BAG' : 'MOVE TO BAG',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: item.isInCart
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.onPrimary,
+                        ),
                       ),
                     ),
                   ),
@@ -400,6 +428,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
         await CartApiService.removeFromCart(
           uid: uid,
           variationId: item.variationId,
+          mappingCode: item.mappingCode,
+          quantity: 1,
         );
 
         _showMessage('Removed from bag', isSuccess: true);
@@ -408,6 +438,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
         await CartApiService.addToCart(
           uid: uid,
           variationId: item.variationId,
+          mappingCode: item.mappingCode,
           quantity: 1,
         );
 
@@ -417,6 +448,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
       // Refresh wishlist to update the button state
       if (mounted) {
         await _wishlistLogic.initializeWishlist();
+        // Also refresh global counts so header badges stay in sync
+        await CountStateManager().refresh();
       }
     } catch (e) {
       _showMessage('Failed to update cart', isSuccess: false);
@@ -435,7 +468,9 @@ class _WishlistScreenState extends State<WishlistScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isSuccess ? Colors.green : Colors.red,
+        backgroundColor: isSuccess
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.error,
         duration: const Duration(seconds: 2),
       ),
     );

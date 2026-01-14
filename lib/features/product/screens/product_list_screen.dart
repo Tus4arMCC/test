@@ -18,6 +18,16 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListScreenState extends State<ProductListScreen> {
+  late CountStateManager _countManager;
+
+  @override
+  void initState() {
+    super.initState();
+    _countManager = CountStateManager();
+    // Always refresh counts when this screen is visited
+    _countManager.refresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -32,15 +42,20 @@ class _ProductListScreenState extends State<ProductListScreen> {
           style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: colorScheme.surface.withOpacity(0.95),
-        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: Colors.grey.withOpacity(0.1), height: 1.0),
+          child: Container(
+            color: Colors.grey.withValues(alpha: 0.1),
+            height: 1.0,
+          ),
         ),
         actions: [
-          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
           Stack(
             children: [
               IconButton(
@@ -58,28 +73,33 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 right: 8,
                 top: 8,
                 child: AnimatedBuilder(
-                  animation: CountStateManager(),
+                  animation: _countManager,
                   builder: (context, child) {
-                    final count = CountStateManager().wishlistCount;
+                    final count = _countManager.wishlistCount;
                     if (count == 0) return const SizedBox.shrink();
 
                     return Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: colorScheme.surface,
+                          color: Theme.of(context).colorScheme.surface,
                           width: 2,
                         ),
                       ),
+                      constraints: const BoxConstraints(
+                        minWidth: 20,
+                        minHeight: 20,
+                      ),
                       child: Text(
-                        "$count",
-                        style: TextStyle(
-                          color: colorScheme.onPrimary,
+                        count > 99 ? '99+' : count.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     );
                   },
@@ -102,28 +122,33 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 right: 8,
                 top: 8,
                 child: AnimatedBuilder(
-                  animation: CountStateManager(),
+                  animation: _countManager,
                   builder: (context, child) {
-                    final count = CountStateManager().cartCount;
+                    final count = _countManager.cartCount;
                     if (count == 0) return const SizedBox.shrink();
 
                     return Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary,
+                        color: Theme.of(context).colorScheme.primary,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: colorScheme.surface,
+                          color: Theme.of(context).colorScheme.surface,
                           width: 2,
                         ),
                       ),
+                      constraints: const BoxConstraints(
+                        minWidth: 20,
+                        minHeight: 20,
+                      ),
                       child: Text(
-                        "$count",
-                        style: TextStyle(
-                          color: colorScheme.onPrimary,
+                        count > 99 ? '99+' : count.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     );
                   },
@@ -164,7 +189,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.1))),
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
+        ),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -191,7 +218,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
             Container(
               height: 24,
               width: 1,
-              color: Colors.grey.withOpacity(0.3),
+              color: Colors.grey.withValues(alpha: 0.3),
               margin: const EdgeInsets.symmetric(horizontal: 12),
             ),
             _buildOutlinedFilterChip(theme, "Sort: Recommended"),
@@ -211,7 +238,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
       onPressed: () {},
       style: OutlinedButton.styleFrom(
         foregroundColor: theme.colorScheme.onSurface,
-        side: BorderSide(color: Colors.grey.withOpacity(0.3)),
+        side: BorderSide(color: Colors.grey.withValues(alpha: 0.3)),
         shape: const StadiumBorder(),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
         minimumSize: const Size(0, 36),
@@ -315,7 +342,7 @@ class _ProductGridItem extends StatelessWidget {
 
                     iconSize: 18,
                     showBackground: true,
-                    backgroundColor: Colors.white.withOpacity(0.9),
+                    backgroundColor: Colors.white.withValues(alpha: 0.9),
                     activeColor: theme.colorScheme.primary,
                     inactiveColor: Colors.grey,
                   ),

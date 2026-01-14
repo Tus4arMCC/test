@@ -87,10 +87,32 @@ class MyApp extends StatelessWidget {
               ),
             );
           },
+          navigatorObservers: [CountRefreshObserver()],
           routes: AppRoutes.routes,
           initialRoute: '/',
         );
       },
     );
+  }
+}
+
+/// Observer to refresh counts on navigation
+class CountRefreshObserver extends NavigatorObserver {
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPush(route, previousRoute);
+    _refreshCounts();
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPop(route, previousRoute);
+    _refreshCounts();
+  }
+
+  void _refreshCounts() {
+    // Debounce or just call refresh
+    // Using simple call as per requirement "every time we visit any page"
+    CountStateManager().refresh();
   }
 }

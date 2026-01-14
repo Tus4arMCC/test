@@ -31,13 +31,13 @@ class SellerCard extends StatelessWidget {
           color: isSelected ? const Color(0xFFFFF8F8) : Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? const Color(0xFFDC3545) : Colors.grey[300]!,
+            color: isSelected ? theme.colorScheme.primary : Colors.grey[300]!,
             width: isSelected ? 2 : 1,
           ),
           boxShadow: [
             if (isSelected)
               BoxShadow(
-                color: const Color(0xFFDC3545).withOpacity(0.15),
+                color: theme.colorScheme.primary.withOpacity(0.15),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               )
@@ -61,7 +61,7 @@ class SellerCard extends StatelessWidget {
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: Colors.grey[50],
+                    color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(color: Colors.grey[200]!),
                   ),
@@ -84,7 +84,7 @@ class SellerCard extends StatelessWidget {
                         seller.seller,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -98,21 +98,21 @@ class SellerCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.green,
+                              color: theme.colorScheme.primary,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Row(
                               children: [
                                 Text(
                                   (seller.rating ?? 4.5).toStringAsFixed(1),
-                                  style: const TextStyle(
+                                  style: theme.textTheme.bodyMedium?.copyWith(
                                     color: Colors.white,
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(width: 2),
-                                const Icon(
+                                Icon(
                                   Icons.star,
                                   color: Colors.white,
                                   size: 10,
@@ -134,16 +134,16 @@ class SellerCard extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: isSelected
-                          ? const Color(0xFFDC3545)
+                          ? theme.colorScheme.primary
                           : Colors.grey[400]!,
                       width: 2,
                     ),
                     color: isSelected
-                        ? const Color(0xFFDC3545)
+                        ? theme.colorScheme.primary
                         : Colors.transparent,
                   ),
                   child: isSelected
-                      ? const Icon(Icons.check, size: 14, color: Colors.white)
+                      ? Icon(Icons.check, size: 14, color: Colors.white)
                       : null,
                 ),
               ],
@@ -158,17 +158,17 @@ class SellerCard extends StatelessWidget {
               children: [
                 Text(
                   "₹${seller.price.toStringAsFixed(0)}",
-                  style: const TextStyle(
+                  style: theme.textTheme.bodyMedium?.copyWith(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFFDC3545),
+                    color: theme.colorScheme.primary,
                   ),
                 ),
                 const SizedBox(width: 8),
                 if (seller.mrp > seller.price) ...[
                   Text(
                     "₹${seller.mrp.toStringAsFixed(0)}",
-                    style: TextStyle(
+                    style: theme.textTheme.bodyMedium?.copyWith(
                       fontSize: 12,
                       color: Colors.grey[600],
                       decoration: TextDecoration.lineThrough,
@@ -177,7 +177,7 @@ class SellerCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     "${((1 - (seller.price / seller.mrp)) * 100).round()}% OFF",
-                    style: const TextStyle(
+                    style: theme.textTheme.bodyMedium?.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.green,
@@ -191,15 +191,18 @@ class SellerCard extends StatelessWidget {
             // Benefits / Delivery
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.local_shipping_outlined,
                   size: 14,
-                  color: Colors.green,
+                  color: theme.colorScheme.primary,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   "Free Delivery",
-                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 12,
+                    color: Colors.grey[700],
+                  ),
                 ),
               ],
             ),

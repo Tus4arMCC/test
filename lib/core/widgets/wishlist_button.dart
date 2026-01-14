@@ -71,10 +71,10 @@ class _WishlistButtonState extends State<WishlistButton>
   @override
   void initState() {
     super.initState();
-    // Use global state if available, otherwise use widget prop
+    // Prefer explicit widget state from API; fall back to global manager
     _isInWishlist =
-        _wishlistManager.isInWishlist(widget.variationId) ||
-        widget.isInWishlist;
+        widget.isInWishlist ||
+        _wishlistManager.isInWishlist(widget.variationId);
 
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 200),
@@ -87,6 +87,18 @@ class _WishlistButtonState extends State<WishlistButton>
 
     // Listen to global wishlist changes
     _wishlistManager.addListener(_onWishlistStateChanged);
+  }
+
+  @override
+  void didUpdateWidget(covariant WishlistButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // When the parent passes new API data, keep local state in sync.
+    if (oldWidget.variationId != widget.variationId ||
+        oldWidget.isInWishlist != widget.isInWishlist) {
+      _isInWishlist =
+          widget.isInWishlist ||
+          _wishlistManager.isInWishlist(widget.variationId);
+    }
   }
 
   void _onWishlistStateChanged() {
@@ -161,7 +173,7 @@ class _WishlistButtonState extends State<WishlistButton>
 
     final activeColor = widget.activeColor ?? colorScheme.error;
     final inactiveColor =
-        widget.inactiveColor ?? colorScheme.onSurface.withOpacity(0.6);
+        widget.inactiveColor ?? colorScheme.onSurface.withValues(alpha: 0.6);
 
     Widget iconWidget = ScaleTransition(
       scale: _scaleAnimation,
@@ -198,11 +210,11 @@ class _WishlistButtonState extends State<WishlistButton>
         width: widget.iconSize + 16,
         height: widget.iconSize + 16,
         decoration: BoxDecoration(
-          color: widget.backgroundColor ?? Colors.white.withOpacity(0.9),
+          color: widget.backgroundColor ?? Colors.white.withValues(alpha: 0.9),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),

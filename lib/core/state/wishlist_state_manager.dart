@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../features/home/models/cart_wishlist_models.dart';
 import '../../features/home/services/wishlist_api_service.dart';
 import '../utils/cookie_utils.dart';
+import 'count_state_manager.dart';
 
 /// Global wishlist state manager
 /// Tracks which products are in the wishlist across the entire app
@@ -76,6 +77,10 @@ class WishlistStateManager extends ChangeNotifier {
     } catch (e) {
       debugPrint('Error toggling wishlist: $e');
       // Verify state from server if error occurs?
+    } finally {
+      try {
+        await CountStateManager().refresh();
+      } catch (_) {}
     }
   }
 

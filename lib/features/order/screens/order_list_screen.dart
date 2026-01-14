@@ -11,7 +11,13 @@ class OrderListScreen extends StatefulWidget {
 }
 
 class _OrderListScreenState extends State<OrderListScreen> {
-  final List<String> _filters = ['All', 'Processing', 'Shipped', 'Delivered', 'Returns'];
+  final List<String> _filters = [
+    'All',
+    'Processing',
+    'Shipped',
+    'Delivered',
+    'Returns',
+  ];
   String _activeFilter = 'All';
 
   @override
@@ -20,7 +26,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
@@ -28,14 +34,11 @@ class _OrderListScreenState extends State<OrderListScreen> {
         ),
         title: Text(
           "My Orders",
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search),
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
           ),
-        ],
+        ),
+        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.search))],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(60),
           child: SingleChildScrollView(
@@ -51,28 +54,41 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     borderRadius: BorderRadius.circular(20),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
-                        color: isActive ? AppColors.primary : colorScheme.surface,
+                        color: isActive
+                            ? AppColors.primary
+                            : colorScheme.surface,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: isActive ? AppColors.primary : colorScheme.outline.withOpacity(0.1),
+                          color: isActive
+                              ? AppColors.primary
+                              : colorScheme.outline.withValues(alpha: 0.1),
                         ),
                         boxShadow: isActive
                             ? [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.3),
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.3,
+                                  ),
                                   blurRadius: 8,
                                   offset: const Offset(0, 4),
-                                )
+                                ),
                               ]
                             : null,
                       ),
                       child: Text(
                         filter,
                         style: TextStyle(
-                          color: isActive ? Colors.white : colorScheme.onSurface.withOpacity(0.7),
-                          fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                          color: isActive
+                              ? Colors.white
+                              : colorScheme.onSurface.withValues(alpha: 0.7),
+                          fontWeight: isActive
+                              ? FontWeight.bold
+                              : FontWeight.w500,
                           fontSize: 14,
                         ),
                       ),
@@ -163,10 +179,12 @@ class _OrderListScreenState extends State<OrderListScreen> {
         decoration: BoxDecoration(
           color: colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colorScheme.outline.withOpacity(0.05)),
+          border: Border.all(
+            color: colorScheme.outline.withValues(alpha: 0.05),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -193,14 +211,20 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     const SizedBox(height: 4),
                     Text(
                       "Placed on $date",
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -210,7 +234,10 @@ class _OrderListScreenState extends State<OrderListScreen> {
                         Container(
                           width: 6,
                           height: 6,
-                          decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+                          decoration: BoxDecoration(
+                            color: statusColor,
+                            shape: BoxShape.circle,
+                          ),
                         )
                       else if (status == "Shipped")
                         Icon(Icons.local_shipping, color: statusColor, size: 14)
@@ -233,28 +260,38 @@ class _OrderListScreenState extends State<OrderListScreen> {
             const SizedBox(height: 16),
             Row(
               children: [
-                ...images.map((url) => Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: AppImage(
-                    imageUrl: url,
-                    width: 64,
-                    height: 64,
-                    borderRadius: 8,
-                  ),
-                )).toList(),
+                ...images
+                    .map(
+                      (url) => Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: AppImage(
+                          imageUrl: url,
+                          width: 64,
+                          height: 64,
+                          borderRadius: 8,
+                        ),
+                      ),
+                    )
+                    .toList(),
                 if (moreCount > 0)
                   Container(
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      border: Border.all(color: colorScheme.outline.withOpacity(0.1), style: BorderStyle.none),
+                      border: Border.all(
+                        color: colorScheme.outline.withValues(alpha: 0.1),
+                        style: BorderStyle.none,
+                      ),
                       borderRadius: BorderRadius.circular(8),
                       color: colorScheme.surface,
                     ),
                     child: Center(
                       child: Text(
                         "+$moreCount",
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
                   ),
@@ -289,15 +326,27 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     backgroundColor: colorScheme.surface,
                     foregroundColor: colorScheme.onSurface,
                     elevation: 0,
-                    side: BorderSide(color: colorScheme.outline.withOpacity(0.1)),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    side: BorderSide(
+                      color: colorScheme.outline.withValues(alpha: 0.1),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   child: Row(
                     children: [
                       Text(
-                        status == "Processing" || status == "Shipped" ? "Track Order" : "View Details",
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                        status == "Processing" || status == "Shipped"
+                            ? "Track Order"
+                            : "View Details",
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const Icon(Icons.chevron_right, size: 18),
                     ],
@@ -319,7 +368,12 @@ class _OrderListScreenState extends State<OrderListScreen> {
       children: [
         const Text(
           "LOADING PREVIEW",
-          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.5),
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+            letterSpacing: 1.5,
+          ),
         ),
         const SizedBox(height: 12),
         Container(
@@ -338,7 +392,11 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     children: [
                       ScheduledSkeleton(height: 12, width: 80, borderRadius: 4),
                       SizedBox(height: 8),
-                      ScheduledSkeleton(height: 14, width: 120, borderRadius: 4),
+                      ScheduledSkeleton(
+                        height: 14,
+                        width: 120,
+                        borderRadius: 4,
+                      ),
                     ],
                   ),
                   ScheduledSkeleton(height: 24, width: 70, borderRadius: 8),
@@ -346,10 +404,17 @@ class _OrderListScreenState extends State<OrderListScreen> {
               ),
               const SizedBox(height: 16),
               Row(
-                children: List.generate(3, (index) => const Padding(
-                  padding: EdgeInsets.only(right: 12),
-                  child: ScheduledSkeleton(height: 60, width: 60, borderRadius: 8),
-                )),
+                children: List.generate(
+                  3,
+                  (index) => const Padding(
+                    padding: EdgeInsets.only(right: 12),
+                    child: ScheduledSkeleton(
+                      height: 60,
+                      width: 60,
+                      borderRadius: 8,
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               const Divider(height: 1),
@@ -362,7 +427,11 @@ class _OrderListScreenState extends State<OrderListScreen> {
                     children: [
                       ScheduledSkeleton(height: 10, width: 60, borderRadius: 4),
                       SizedBox(height: 6),
-                      ScheduledSkeleton(height: 20, width: 100, borderRadius: 4),
+                      ScheduledSkeleton(
+                        height: 20,
+                        width: 100,
+                        borderRadius: 4,
+                      ),
                     ],
                   ),
                   ScheduledSkeleton(height: 36, width: 110, borderRadius: 10),
@@ -380,9 +449,12 @@ class _OrderListScreenState extends State<OrderListScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: colorScheme.surface.withOpacity(0.5),
+        color: colorScheme.surface.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outline.withOpacity(0.1), style: BorderStyle.none),
+        border: Border.all(
+          color: colorScheme.outline.withValues(alpha: 0.1),
+          style: BorderStyle.none,
+        ),
       ),
       child: Column(
         children: [
@@ -392,7 +464,11 @@ class _OrderListScreenState extends State<OrderListScreen> {
               color: colorScheme.surface,
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.shopping_bag_outlined, size: 40, color: Colors.grey[300]),
+            child: Icon(
+              Icons.shopping_bag_outlined,
+              size: 40,
+              color: Colors.grey[300],
+            ),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -410,7 +486,9 @@ class _OrderListScreenState extends State<OrderListScreen> {
             onPressed: () {},
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: const Text("View Returns"),
           ),

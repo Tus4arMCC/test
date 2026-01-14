@@ -56,7 +56,9 @@ class _LoginScreenState extends State<LoginScreen> {
         Future.delayed(const Duration(milliseconds: 800), () {
           if (mounted) {
             // Navigate back to MainTabScreen and clear stack
-            Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+            Navigator.of(
+              context,
+            ).pushNamedAndRemoveUntil('/', (route) => false);
           }
         });
       } else {
@@ -185,7 +187,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ElevatedButton(
                     onPressed: _loading ? null : _login,
                     child: _loading
-                        ? const CircularProgressIndicator(color: Colors.white)
+                        ? const Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          )
                         : const Text("Log In →"),
                   ),
                 ),

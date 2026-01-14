@@ -256,6 +256,7 @@ class WishlistItem {
   final DateTime addedAt;
   final bool isInCart;
   final bool isStockOut;
+  final String? mappingCode;
 
   WishlistItem({
     required this.productId,
@@ -269,6 +270,7 @@ class WishlistItem {
     required this.addedAt,
     this.isInCart = false,
     this.isStockOut = false,
+    this.mappingCode,
   });
 
   Map<String, dynamic> toJson() => {
@@ -282,9 +284,19 @@ class WishlistItem {
     'variant': variant,
     'addedAt': addedAt.toIso8601String(),
     'isInCart': isInCart,
+    if (mappingCode != null) 'mappingCode': mappingCode,
   };
 
   factory WishlistItem.fromJson(Map<String, dynamic> json) {
+    // Extract sellerPriceDTO if available
+    final sellerDto = json['sellerPriceDTO'] as Map<String, dynamic>?;
+
+    // Resolve mappingCode with priority: sellerPriceDTO > root mappingCode > root mapping_code
+    final resolvedMappingCode =
+        sellerDto != null && sellerDto['mappingCode'] != null
+        ? sellerDto['mappingCode'] as String
+        : (json['mappingCode'] ?? json['mapping_code']);
+
     return WishlistItem(
       productId: json['productCode'] ?? json['productId'] ?? '',
       variationId: json['variationCode'] ?? json['variationId'] ?? '',
@@ -302,11 +314,13 @@ class WishlistItem {
           ? DateTime.parse(json['addedAt'])
           : DateTime.now(),
       isInCart: json['isInCart'] ?? false,
+      mappingCode: resolvedMappingCode,
     );
   }
 
   @override
-  String toString() => 'WishlistItem(id: $productId, name: $name)';
+  String toString() =>
+      'WishlistItem(id: $productId, name: $name, mappingCode: $mappingCode)';
 }
 
 /// Model for the entire wishlist

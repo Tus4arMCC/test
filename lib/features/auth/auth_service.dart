@@ -42,7 +42,11 @@ class AuthService {
       }),
     );
 
-    return jsonDecode(res.body);
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body);
+    } else {
+      throw Exception("Registration failed: ${res.statusCode}");
+    }
   }
 
   /// OTP VERIFY
@@ -62,7 +66,11 @@ class AuthService {
       }),
     );
 
-    return jsonDecode(res.body);
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body);
+    } else {
+      throw Exception("OTP Verification failed: ${res.statusCode}");
+    }
   }
 
   static Future<Map<String, dynamic>> forgetPassword({

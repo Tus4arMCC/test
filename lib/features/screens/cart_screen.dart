@@ -85,13 +85,24 @@ class _CartScreenState extends State<CartScreen> {
                 final message = await _cartLogic.removeFromCart(
                   item.variationId,
                 );
+
+                // Refresh cart from server to ensure UI shows fresh data
+                await _cartLogic.initializeCart();
+
+                // Remove the variation from current selection to avoid stale selections
+                setState(() {
+                  _selectedVariationIds.remove(item.variationId);
+                });
+
                 ScaffoldMessenger.of(
                   context,
                 ).showSnackBar(SnackBar(content: Text(message)));
               } catch (e) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text(e.toString())));
+                if (context.mounted) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(e.toString())));
+                }
               }
             },
             child: const Text('Yes', style: TextStyle(color: Colors.red)),
@@ -111,7 +122,7 @@ class _CartScreenState extends State<CartScreen> {
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
         scrolledUnderElevation: 0,
-        backgroundColor: colorScheme.surface.withOpacity(0.9),
+        backgroundColor: colorScheme.surface.withValues(alpha: 0.9),
         automaticallyImplyLeading: widget.showBackButton,
         leading: widget.showBackButton
             ? IconButton(
@@ -283,13 +294,13 @@ class _CartScreenState extends State<CartScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isSelected
-              ? colorScheme.primary.withOpacity(0.5)
-              : Colors.grey.withOpacity(0.2),
+              ? colorScheme.primary.withValues(alpha: 0.5)
+              : Colors.grey.withValues(alpha: 0.2),
           width: isSelected ? 1.5 : 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -316,7 +327,7 @@ class _CartScreenState extends State<CartScreen> {
                   AppImage(imageUrl: item.image, fit: BoxFit.cover),
                   if (!item.inStock)
                     Container(
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                       alignment: Alignment.center,
                       child: const Text(
                         "OUT OF STOCK",
@@ -406,13 +417,17 @@ class _CartScreenState extends State<CartScreen> {
                               variationId: item.variationId,
                               newQuantity: item.quantity - 1,
                             );
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(SnackBar(content: Text(message)));
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(SnackBar(content: Text(message)));
+                            }
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(e.toString())),
-                            );
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(e.toString())),
+                              );
+                            }
                           }
                         },
                         onPlus: () async {
@@ -421,13 +436,17 @@ class _CartScreenState extends State<CartScreen> {
                               variationId: item.variationId,
                               newQuantity: item.quantity + 1,
                             );
-                            ScaffoldMessenger.of(
-                              context,
-                            ).showSnackBar(SnackBar(content: Text(message)));
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(SnackBar(content: Text(message)));
+                            }
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(e.toString())),
-                            );
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(e.toString())),
+                              );
+                            }
                           }
                         },
                       ),
@@ -450,7 +469,7 @@ class _CartScreenState extends State<CartScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.05),
+        color: Colors.grey.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -495,7 +514,7 @@ class _CartScreenState extends State<CartScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -545,7 +564,7 @@ class _CartScreenState extends State<CartScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -715,10 +734,12 @@ class _CartScreenState extends State<CartScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.1))),
+        border: Border(
+          top: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, -4),
           ),
@@ -774,7 +795,7 @@ class _CartScreenState extends State<CartScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: const StadiumBorder(),
                 elevation: canCheckout ? 4 : 0,
-                shadowColor: colorScheme.primary.withOpacity(0.4),
+                shadowColor: colorScheme.primary.withValues(alpha: 0.4),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

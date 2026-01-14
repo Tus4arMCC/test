@@ -1,3 +1,15 @@
+# Legal Disclaimer
+
+**IMPORTANT: PRIVATE PROPERTY**
+
+This source code and all associated documentation, files, and assets are the exclusive property of **PkSoft** (or the respective private entity owning this repository).
+
+*   **Unauthorized Access**: Accessing this repository without explicit permission is strictly prohibited.
+*   **Unauthorized Use**: Copying, modifying, distributing, or using this code for any purpose without written consent is invalid and illegal.
+*   **Legal Consequences**: Any unauthorized use, reproduction, or dissemination of this material will be met with immediate legal action to the fullest extent of the law.
+
+---
+
 # Cart & Wishlist Flow Documentation
 
 This document provides a deep dive into the technical implementation of the Cart and Wishlist flows for the three user types: **Random User**, **Guest User**, and **Login User**.

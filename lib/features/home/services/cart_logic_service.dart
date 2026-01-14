@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import '../../../core/utils/cookie_utils.dart';
+import '../../../core/state/count_state_manager.dart';
 import '../models/cart_wishlist_models.dart';
 import 'cart_api_service.dart';
 
@@ -90,8 +91,6 @@ class CartLogicService with ChangeNotifier {
     }
   }
 
-  /// Add item to cart
-  /// Returns the message from API response
   Future<String> addToCart({
     required String variationId,
     required int quantity,
@@ -125,6 +124,10 @@ class CartLogicService with ChangeNotifier {
       _error = 'Failed to add to cart: $e';
       notifyListeners();
       rethrow;
+    } finally {
+      try {
+        await CountStateManager().refresh();
+      } catch (_) {}
     }
   }
 
@@ -169,6 +172,10 @@ class CartLogicService with ChangeNotifier {
       _error = 'Failed to update quantity: $e';
       notifyListeners();
       rethrow;
+    } finally {
+      try {
+        await CountStateManager().refresh();
+      } catch (_) {}
     }
   }
 
@@ -186,12 +193,14 @@ class CartLogicService with ChangeNotifier {
         orElse: () => CartVariation(variationId: '', quantity: 0),
       );
       final mappingCode = item.mappingCode;
+      final quantity = item.quantity;
 
       // Call cartRemove API
       final response = await CartApiService.removeFromCart(
         uid: uid,
         variationId: variationId,
         mappingCode: mappingCode,
+        quantity: quantity,
       );
 
       if (!response.success) {
@@ -206,6 +215,10 @@ class CartLogicService with ChangeNotifier {
       _error = 'Failed to remove from cart: $e';
       notifyListeners();
       rethrow;
+    } finally {
+      try {
+        await CountStateManager().refresh();
+      } catch (_) {}
     }
   }
 
@@ -263,7 +276,7 @@ class CartLogicService with ChangeNotifier {
       // Refresh cart
       await initializeCart();
 
-      return token as String;
+      return token;
     } catch (e) {
       _error = 'Checkout failed: $e';
       notifyListeners();
@@ -271,6 +284,9 @@ class CartLogicService with ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+      try {
+        await CountStateManager().refresh();
+      } catch (_) {}
     }
   }
 
@@ -283,6 +299,10 @@ class CartLogicService with ChangeNotifier {
     } catch (e) {
       _error = 'Failed to clear cart: $e';
       notifyListeners();
+    } finally {
+      try {
+        await CountStateManager().refresh();
+      } catch (_) {}
     }
   }
 
@@ -381,32 +401,6 @@ class CartLogicService with ChangeNotifier {
       }
     } catch (e) {
       _error = 'Failed to remove from cart cookie: $e';
-    }
-  }
-
-  /// Check stock status for cart items
-  Future<void> _checkStockStatus(String uid) async {
-    try {
-      final cartCookie = await CookieUtils.getCartCookie();
-      final variations = _parseCartCookie(cartCookie);
-
-      if (variations.isEmpty) return;
-
-      final stockMap = await CartApiService.checkStockStatus(
-        uid: uid,
-        variations: variations,
-      );
-
-      // Update cart items with stock status
-      for (var item in _cart.items) {
-        if (stockMap.containsKey(item.variationId)) {
-          // In a real app, you might mark out-of-stock items
-          // For now, just track the status
-        }
-      }
-    } catch (e) {
-      debugPrint('Stock check error: $e');
-      // Don't show error for stock check, just log it
     }
   }
 

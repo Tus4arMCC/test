@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../../../core/storage/auth_storage.dart';
 import '../../../core/constants/api_urls.dart';
 import '../models/cart_wishlist_models.dart';
+import '../../../core/state/count_state_manager.dart';
 
 /// Response model for cart API operations
 class CartApiResponse {
@@ -157,7 +158,7 @@ class CartApiService {
         'variations': variations
             .map(
               (v) => {
-                'mappingCode': v.mappingCode ?? v.variationId,
+                'mappingCode': v.mappingCode,
                 'qty': v.quantity,
                 'isOutOfStock': false,
               },
@@ -224,7 +225,12 @@ class CartApiService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         final code = data['code'] ?? data['messageCode'] ?? 0;
-        return code == 100;
+        if (code == 100) {
+          // Refresh counts on successful order
+          await CountStateManager().refresh();
+          return true;
+        }
+        return false;
       } else {
         throw Exception('Failed to finalize order (${response.statusCode})');
       }
@@ -291,7 +297,8 @@ class CartApiService {
       final payload = {
         'uid': uid,
         'variationCode': variationId,
-        'mappingCode': mappingCode ?? variationId,
+        'mappingCode': mappingCode,
+        'quantity': quantity,
         'd': _getEncodedTimestamp(),
       };
 
@@ -323,6 +330,7 @@ class CartApiService {
   static Future<CartApiResponse> removeFromCart({
     required String uid,
     required String variationId,
+    required int quantity,
     String? mappingCode,
   }) async {
     try {
@@ -331,7 +339,8 @@ class CartApiService {
       final payload = {
         'uid': uid,
         'variationCode': variationId,
-        'mappingCode': mappingCode ?? variationId,
+        'mappingCode': mappingCode,
+        'quantity': quantity,
         'd': _getEncodedTimestamp(),
       };
 
